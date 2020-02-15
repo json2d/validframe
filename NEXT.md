@@ -69,18 +69,50 @@ def atleast(min):
 
 this flexiblity is not really there with the previous approach - additional boilerplate would be needed for each quantifier to be supported
 
-## pedal to the metal using Ramda
+## pedal to the metal with Ramda helpers
+
+time to double down on the functional approach and use some functional helpers from a package like Ramda
+
+the good:
 
 ```py
 import ramda as R
 
-vf.cells.validator(R.gte(0))
 vf.cells.validator(R.equals(0))
-
-vf.cells.validator(R.equals(111), filter=R.gt(0))
-
-vf.cells.validator(R.equals(111), n=R.all(R.identity))
-vf.cells.validator(R.equals(111), n=atleast(3)) # not sure how you could do this one with Ramda
-
 vf.cells.validator(R.either(R.equals(111),R.equals(-100)))
+vf.cells.validator(R.equals(111), filter=R.compose(R.negate, R.is_nil)) # `R.compose` saves the day
 ```
+
+the bad:
+
+```py
+vf.cells.validator(R.flip(R.gte))(0)) # need to flip to actually mean 'cell is greater than 0'
+vf.cells.validator(R.equals(111), n=R.all(R.identity)) # same as `n=any` from above but crazy
+
+```
+
+it get even worse when trying to implement `atleast` with Ramda:
+
+ref: https://pypi.org/project/ramda/
+
+```py
+# first try
+atleast = lambda min : lambda iterable : R.gte(len(R.filter(R.identity, iterable)), min)
+
+# another way
+atleast = lambda min : lambda iterable : R.gte(R.count_by(R.identity, iterable), min)
+```
+
+that was bad - so lets try again with even more Ramda:
+
+```py
+atleast = lambda min : R.compose(R.lte(min), R.count_by(R.identity)) # returns a function that returns `True` if `min` is less than or equal to the number of truthy elements
+
+atleast = lambda min : R.pipe(R.count_by(R.identity), R.lte(min)) # the flipped logic on R.lte is super confusing
+
+atleast = lambda min : R.pipe(R.count_by(R.identity), R.flip(R.gte)(min)) # better or worse than without Ramda?
+
+```
+
+while it might look cool its really not super readable, and the tradeoff is that its not performant and so basically not worth it
+
