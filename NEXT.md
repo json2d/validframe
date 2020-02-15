@@ -116,3 +116,16 @@ atleast = lambda min : R.pipe(R.count_by(R.identity), R.flip(R.gte)(min)) # bett
 
 while it might look cool its really not super readable, and the tradeoff is that its not performant and so basically not worth it
 
+## more predefined validators
+
+```py
+
+vf.frame.rows(2)
+vf.frame.cols(2)
+
+vf.cells.unique(col='product_id')
+
+vf.cells.sum(0, col=['credit', 'debit']) # for the accountants
+vf.cells.avg(10, col='net_amount')
+
+```
