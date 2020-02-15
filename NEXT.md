@@ -68,3 +68,19 @@ def atleast(min):
 ```
 
 this flexiblity is not really there with the previous approach - additional boilerplate would be needed for each quantifier to be supported
+
+## pedal to the metal using Ramda
+
+```py
+import ramda as R
+
+vf.cells.validator(R.gte(0))
+vf.cells.validator(R.equals(0))
+
+vf.cells.validator(R.equals(111), filter=R.gt(0))
+
+vf.cells.validator(R.equals(111), n=R.all(R.identity))
+vf.cells.validator(R.equals(111), n=atleast(3)) # not sure how you could do this one with Ramda
+
+vf.cells.validator(R.either(R.equals(111),R.equals(-100)))
+```
