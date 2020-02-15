@@ -125,7 +125,53 @@ vf.frame.cols(2)
 
 vf.cells.unique(col='product_id')
 
-vf.cells.sum(0, col=['credit', 'debit']) # for the accountants
+vf.cells.sum(0, col=['credit', 'debit']) # for all my accountants
 vf.cells.avg(10, col='net_amount')
 
+```
+
+here `unique`, `sum` and `avg` would use a new base validator which validates some reduction of the cell values
+
+eg. heres how code for the `sum` validator would look using the proposed new base validator `vf.cells.reduce_validator`:
+
+```py
+validate_sum_of_all_is_zero = vf.cells.reduce_validator( 
+  R.equals(0), # validate function
+  R.reduce(R.add, 0), # reduce function
+  fail_msg = 'sum was not {}'.format(val)
+)
+
+# this is the same as above but using the reducer `R.sum` 
+validate_sum_of_all_is_zero = vf.cells.reduce_validator(R.equals(0), R.sum, fail_msg = 'sum was not {}'.format(val)) 
+
+# parameterized pass val and selector kwargs
+sum = lambda val, **kwargs : vf.cells.reduce_validator(R.equals(val), R.sum, fail_msg = 'sum was not {}'.format(val), **kwargs) 
+
+# this is the same as above but sans lambdas
+def sum(val, **kwargs):
+  return vf.cells.reduce_validator( 
+    R.equals(val),
+    R.sum,
+    'sum was not {}'.format(val),
+    **kwargs
+  )
+
+# with builtin instead of all the Ramda
+from functools import reduce 
+import operator
+
+def sum(val, **kwargs):
+  return vf.cells.reduce_validator( 
+    lambda x : x == val,
+    lambda cells : reduce(operator.add, cells, 0)
+    'sum was not {}'.format(val),
+    **kwargs
+  )  
+```
+
+the other base validator `vf.cells.map_validator` which validates the cell values individually may be used a bit more, so it could just take the shorthand alias
+
+```py
+vf.cells.map_validator(...) 
+vf.cells.validator(...) # alias for `map_validator`
 ```
