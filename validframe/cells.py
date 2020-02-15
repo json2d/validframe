@@ -1,15 +1,19 @@
-def validator(validate_cell, col=None, row=None, filter=None):
+def validator(validate_cell, fail_msg=None, col=None, row=None, filter=None):
 
-  assert callable(validate_cell), 'validate_cell arg must be callable'
+  assert callable(validate_cell), "argument 'validate_cell' must be callable"
 
-  def assert_valid(df, **kwargs): 
-    # assert any(df.applymap( ... )
+  def assert_is_valid(df, **kwargs): 
+    # assert any( ... )
     raise NotImplementedError
 
-  return assert_valid
+  return assert_is_valid
 
 def positive(**kwargs):
-  return validator(lambda x : x > 0, **kwargs)
+  return validator(
+    validate_cell=lambda x : x > 0, 
+    fail_msg="cells should be positive",
+    **kwargs
+  )
 
 # or with just lambdas
-negative = lambda **kwargs : validator(lambda x: x < 0, **kwargs)
+negative = lambda **kwargs : validator(lambda x: x < 0, "cells should be negative", **kwargs)

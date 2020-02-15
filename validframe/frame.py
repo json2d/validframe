@@ -1,12 +1,12 @@
-def validator(validate_df, fail_msg):
+def validator(validate_frame, fail_msg=None):
   
-  assert callable(validate_df), 'validate_df arg must be callable'
+  assert callable(validate_frame), "argument 'validate_frame' must be callable"
 
-  def assert_valid(df, **kwargs): 
+  def assert_is_valid(df, **kwargs): 
     
-    assert validate_df(df), fail_msg
+    assert validate_frame(df), fail_msg
 
-  return assert_valid
+  return assert_is_valid
 
 def existant():
   return validator(lambda df: df.shape[0] + df.shape[1] > 0, 'df must be existant')
