@@ -15,10 +15,11 @@ df = pd.DataFrame(
     [1, 3.14] # row 3
   ])
 
-vf.cells.validator(lambda x: , col='a')(df)
+vf.cells.validator(lambda x: x>0)(col='a')(df)
 
 # validate that all cells that are numbers are also positive
-vf.cells.validator(lambda x: x>0, filter=lambda x: isinstance(x, Number) )(df)
+vf.cells.validator(any, lambda x: x>0)(filter=lambda x: isinstance(x, Number))(df)
+vf.cells.reduce_validator(R.all(R.identity), R.equals(0), R.sum)(filter=lambda x: isinstance(x, Number))(df)
 
 vf.cells.positive()(df) # AssertionError
 vf.cells.not_empty()(df) # AssertionError
@@ -34,9 +35,9 @@ vf.cells.not_empty(col='b')(df) # AssertionError
 vf.cells.empty(col='b', row=1)(df)
 vf.cells.empty(col='b')(df) # AssertionError
 
-vf.cells.min(0, col='a')(df)
-vf.cells.max(2, col='a')(df)
-vf.cells.minmax(0, 2, col='a')(df)
+vf.cells.min(0)(col='a')(df)
+vf.cells.max(2)(col='a')(df)
+vf.cells.minmax(0, 2)(col='a')(df)
 
 vf.cells.ints(col='a')(df)
 vf.cells.ints(row=0)(df)
