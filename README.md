@@ -17,10 +17,6 @@ df = pd.DataFrame(
 
 vf.cells.validator(lambda x: x>0)(col='a')(df)
 
-# validate that all cells that are numbers are also positive
-vf.cells.validator(any, lambda x: x>0)(filter=lambda x: isinstance(x, Number))(df)
-vf.cells.reduce_validator(R.all(R.identity), R.equals(0), R.sum)(filter=lambda x: isinstance(x, Number))(df)
-
 vf.cells.positive()(df) # AssertionError
 vf.cells.not_empty()(df) # AssertionError
 vf.cells.empty()(df) # AssertionError
