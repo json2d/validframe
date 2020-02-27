@@ -488,3 +488,88 @@ other good names for the function that validates a dataframe:
 - `validate`
 - `call`
 - `execute`
+
+
+## curry quantifiers
+
+on initial thought, having `any_` and `all_` versions of predefined validators seems like a sensible approach in that it provides convenience for developers, esp ones using auto-complete. then drilling deeper into the concept it turns out we'll also need `not_any` and `not_all`.
+
+this could also become an antipattern and source of confusion since it effectively creates different ways to write code that does the thing. 
+
+```py
+bloating_validators = [
+  vf.cells.all_positive(),
+  vf.cells.any_positive(),
+  vf.cells.not_all_positive(),
+  vf.cells.not_any_positive(),
+  vf.cells.positive(quantifier=atleast(3)),
+  vf.cells.any_empty(),
+  vf.cells.all_empty(col='b', row=[1,2]),
+  vf.cells.not_all_empty(col='b', row=[1,2]),
+  vf.cells.not_all_not_empty(col=['a','c'], row=[0,3]),
+  vf.cells.any_min(0, col=['a','b'], row=3),
+  vf.cells.not_any_max(3.14, col=['a','b'], row=3),
+  vf.cells.all_minmax(-42, 3.14, filter=R.is(Number)),
+  vf.cells.all_min(3.14, col=['a','b'], row=3),
+  vf.cells.all_max(0, col=['a','b'], row=3),
+  vf.cells.all_minmax(0, 2, filter=R.is(Number)),
+  vf.cells.all_ints(col='b'),
+  vf.cells.all_floats(col='a'),
+  vf.cells.all_strs(row=3), 
+  # ...
+]
+```
+
+the bloat is nice in some ways - for one its more readable than this:
+
+```py
+vf.cells.positive(n=not_any)
+vf.cells.positive(n=not_all)
+vf.cells.positive(n=all)
+vf.cells.positive(n=any)
+vf.cells.positive(n=atleast(3))
+```
+
+this would be crazy:
+
+```py
+vf.cells(all).positive()
+vf.cells(all, row=3).positive()
+vf.cells(all, row=3, filter=R.is(Number)).positive()
+vf.cells(not_any, row=3, filter=R.is(Number)).positive()
+vf.cells(atleast(3), rows=3, filter=R.is(Number)).positive()
+vf.cells(not_any, row=3, filter=R.is(Number)).positive()
+
+```
+
+or better yet:
+
+```py
+vf.cells().positive()
+vf.cells(all).positive()
+vf.cells(any).positive(row=3)
+vf.cells(not_all, row=3, filter=R.is(Number)).positive()
+vf.cells(not_any).positive(row=3, col='names', filter=R.is(Number))
+vf.cells(atleast(3)).positive(row=3, col='names', filter=R.is(Number))
+vf.cells(atmost(1)).positive()
+```
+
+readable but also a bit weird!
+
+this next one goes all in on readability:
+
+```py
+vf.cells(not_all).in_rows(3).filter(R.is(Number)).is_positive()
+vf.cells(not_all).in_cols('balance').filter(R.is(Number)).is_positive()
+vf.cells_validator(any).in_cols('balance').filter(R.is(Number)).is_positive()
+vf.cells_validator(any).in_cols('balance').filter(R.is(Number)).is_minmax(0,10)
+
+
+some_number_cells_in_col_balances = vf.cells(not_all).filter(R.is(Number)).in_cols('balances')
+
+some_number_cells_in_row_3.total_eq()
+some_number_cells_in_row_3.positive()
+some_number_cells_in_row_3.negative()
+
+
+```
