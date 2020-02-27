@@ -332,3 +332,159 @@ R.compose(vf.cells.gte(1000), slice_debit) # 🏅 not flipped unlike `R.gte`
 obviously those are highly recommended for keeping the code super terse and readable.
 
 in general the [proposed] base validator `vf.cells.validator` comes the most in handy when defining the more cornery validations where you might need to much more Ramda, `lambda` and/or just straight Python to describe more complex pass/fail conditions
+
+
+## whats your pattern of creating validators?
+
+so heres the very FPy approach:
+
+```py
+sum_nums_eq = lambda n : create_validator(R.compose(R.equals(n), R.sum, R.filter(R.is(Number))), "{} must be less than the sum of all number elements".format(n))
+sum_nums_eq(0)([1,None,-1]) # true
+```
+
+and heres the pythonic kwargsy approach:
+
+```py
+sum_nums_eq = lambda n : create_validator(R.equals(n), reducer=R.sum, filter=R.is(Number)), "{} must be less than the sum of all number elements".format(n))
+sum_nums_eq(0)([1,None,-1]) # true
+
+# coarser
+sum_eq = lambda n, **kwargs : create_validator(R.equals(n), reducer=R.sum, **kwargs), "{} must be less than the sum of all elements".format(n))
+
+# now we can spread in custom filters
+sum_eq(0, filter=R.is(Number))([1,None,-1]) # true
+
+sum_nums_eq = lambda n : sum_eq(n, filter=R.is(Number))
+sum_nums_eq(0)([1,None,-1]) # true
+```
+
+kwargs approach looks more flexible on the surface, but thats kind of a lie as it can be a bit confusing whats really being done with some of the args
+
+
+## joining validation messages with compose
+
+so how about composing validators, which internally composes their `predicate` and (especially cool) their `fail_msg` values? so we can take a group of these 'validator components' and use them modularly 
+
+```py
+filter_nums = V(R.filter(R.is(Number)), "all number elements"
+sum_all = V(R.sum, "summed")
+eq_zero = V(R.equals(0), "equals 0")
+validator = V.pipe(filter_nums, sum_all, eq_zero)
+
+eq = lambda n : V(R.equals(n), "equals {}".format(n))
+validator = V.pipe(filter_nums, sum_all, eq(0))
+
+validator.validate([-1000,None,0]) # AssertionError: all number elements summed equals 0
+
+
+validator = V.pipe(filter_nums, count_all, eq(0))
+validator.validate([-1000,None,0]) # AssertionError: all number elements counted equals 0
+
+```
+
+## weird validations
+
+- all in column `'balance'` groupby column `'company'` each summed is between -1 and 1
+
+```py
+R.pipe(vf.slice(col=['company', 'balance']), R.groupby()) # oops, need to look at each row, not each cell!
+
+R.pipe(
+  vf.rows.slice(col=['company', 'balance']), 
+  R.reduceby(lambda acc, row: acc.append(row['balance']), [], R.prop('company')), 
+  R.values, 
+  R.map(R.sum), 
+  R.all(R.both(R.gt(1), R.lt(-1))))
+
+```
+
+you can do it this way with some `lambda`:
+
+```py
+R.pipe(
+  vf.rows.slicer(col=['company', 'balance']), 
+  R.reduceby(lambda acc, row: acc + row['balance'], 0, lambda row: row['company']), 
+  R.values, 
+  R.all(R.both(R.gt(1), R.lt(-1)))
+)
+```
+
+lambda acc : lambda row_fn : lambda acc, row: acc + row_fn(row)
+
+R
+
+but also this is how you do it with only Ramda:
+
+```py
+is_balanced_enough = R.pipe(
+  R.groupBy(R.prop('company')), 
+  R.values, 
+  R.map(R.map(R.prop('balance'))), # doubly mapped
+  R.map(R.sum),
+  R.all(R.both(R.gt(1), R.lt(-1)))
+)
+
+assert is_balanced_enough(company_balances)
+
+```
+
+this also works:
+
+```py
+all_company_balances_summed_close_to_zero = R.pipe(
+  R.groupBy(R.prop('company')), 
+  R.values, 
+  R.map(R.pipe(R.map(R.prop('balance'), R.sum, Math.abs))), # doubly mapped
+  R.all(R.both(R.gt(1)))
+)
+```
+
+heres the imperative pythonic way w/o all the Ramda
+
+```py
+def all_company_balances_summed_close_to_zero(rows):
+  xs = {}
+  for row in rows:
+    c = row['company']
+    b = row['balance']
+    if c in x:
+      xs[c] = b   
+    else:
+      xs[c] += b
+
+  return all([ -1 < x and x < 1 for x in xs.values()])
+```
+
+
+## `Validator` object
+
+```py
+vf.cells.sum_eq = lambda n, **kwargs : DfCellsValidator(R.pipe(R.sum, R.equals(n)), "sum equals {}".format(n), **kwargs)
+
+vf.cells.sum_eq(0, cols=['balances'])(df)
+```
+
+`DfCellsValidator` internally extracts iterable `cells` from a `df`. then the `predicate` will be applied on the `cells` to say whether it passed or fail
+
+so then you'll also have `DfRowsValidator` and just `DfValidator`
+
+the `validframe` module should provide enough basic ones
+
+```py
+import validframe as vf
+
+vf.cells.eq(0, n=atleast(1), cols=['balances']).validate(df)
+vf.cells.all_eq(0, cols=['balances']).validate(df)
+vf.cells.any_eq(0, cols=['balances']).validate(df)
+
+vf.row_dicts.eq(0)
+```
+
+other good names for the function that validates a dataframe:
+
+- `apply`
+- `check`
+- `validate`
+- `call`
+- `execute`
