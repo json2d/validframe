@@ -189,7 +189,7 @@ class TestEverything(unittest.TestCase):
       ])
 
     pass_validators = [
-      vf.frame.existant(),
+      vf.frame.not_empty(),
       vf.frame.rows(3),
       vf.frame.cols(4),
       vf.cells.positive(n=any),
@@ -198,9 +198,9 @@ class TestEverything(unittest.TestCase):
       vf.cells.empty(n=any),
       vf.cells.empty(col='b', row=[1,2]),
       vf.cells.not_empty(col=['a','c'], row=[0,3]),
-      vf.cells.min(0, col=['a','b'], row=3),
-      vf.cells.max(3,14, col=['a','b'], row=3),
-      vf.cells.minmax(-42, 3.14, filter=R.is(Number)),
+      # vf.cells.min(0, col=['a','b'], row=3),
+      # vf.cells.max(3.14, col=['a','b'], row=3),
+      # vf.cells.minmax(-42, 3.14, filter=R.is(Number)),
       vf.cells.ints(col='a'),
       vf.cells.floats(col='b', row=3),
       vf.cells.strs(col='c'), 
@@ -210,19 +210,28 @@ class TestEverything(unittest.TestCase):
 
 
     fail_validators = [
-      vf.frame.non_existant(),
+      vf.frame.empty(),
+
       vf.frame.rows(1),
       vf.frame.cols(5),
-      vf.cells.positive(col='b', row=0),
-      vf.cells.negative(col='a'),
+      # vf.cells.positive(col='b', row=0),
+      # vf.cells.negative(col='a'),
+      vf.cells.eq(1, col='a'),
+      vf.cells.gte(1, col='a'),
+      vf.cells.gt(1, col='a'),
+      vf.cells.lt(1, col='a'),
+      vf.cells.lte(1, col='a'),
+
       vf.cells.empty(col=['a','c'], row=[0,3]),
       vf.cells.not_empty(col='b', row=[1,2]),
-      vf.cells.min(3.14, col=['a','b'], row=3),
-      vf.cells.max(0, col=['a','b'], row=3),
-      vf.cells.minmax(0, 2, filter=R.is(Number)),
+      # vf.cells.min(3.14, col=['a','b'], row=3),
+      # vf.cells.max(0, col=['a','b'], row=3),
+      # vf.cells.minmax(0, 2, filter=R.is(Number)),
       vf.cells.ints(col='b'),
       vf.cells.floats(col='a'),
       vf.cells.strs(row=3), 
+      vf.cells.dates(row=3), 
+      vf.cells.bools(col='c'), 
     ]
 
 
@@ -241,8 +250,11 @@ class TestEverything(unittest.TestCase):
 
 
     pass_validators = [
-      vf.cells.total(4, col='a'), 
-      vf.cells.total(-41, col=['a','b'], row=0), 
+      vf.cells.sum(4, col='a'), 
+      vf.cells.sum(R.gte(4), col='a'), 
+      vf.cells.validator(R.pipe(R.sum, R.eq(4))), col='a'), 
+      vf.cells.validator(sum_eq(4), 'sum must equal 4', col='a'), 
+      vf.cells.total(R.eq(-41), col=['a','b'], row=0), 
       vf.cells.total(3.14, col=['a','b'], row=[0,3]), 
       vf.cells.total(-38, filter=lambda x : isinstance(x, int)), 
       vf.cells.total(7.14, filter=lambda x : isinstance(x, Number) and x > 0), 
@@ -253,6 +265,7 @@ class TestEverything(unittest.TestCase):
 
     fail_validators = [
       vf.cells.total(100, col='a'), 
+      vf.cells.total(R.gte(100), col='a'), 
       vf.cells.total(1, row=1), # theres a None in this row
       vf.cells.total('gg', col='c'), 
     ]
