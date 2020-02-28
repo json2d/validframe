@@ -1,2 +1,2 @@
 from . import frame
-from . import cells
+from .core import FrameValidator, CellsValidator, RowsValidator
