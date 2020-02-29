@@ -36,13 +36,13 @@ class TestEverything(unittest.TestCase):
 
   def test_base(self):
 
-    df = pd.DataFrame(
+    test_df = pd.DataFrame(
       columns = ['a','b'],
       data = [
-        [1, -42], # row 1
+        [1, -42], # row 0
+        [1, None], # row 1
         [1, None], # row 2
-        [1, None], # row 3
-        [1, 3.14], # row 4
+        [1, 3.14], # row 3
       ],
       dtype=object # prevent None from being converted to np.nan - ref: https://stackoverflow.com/a/48453225
     )
@@ -52,9 +52,13 @@ class TestEverything(unittest.TestCase):
 
     pass_validators = [
       vf.FrameValidator(
-        lambda df: df.shape[1] == 2, 
-        'must have 2 columns'
+        lambda df: df.columns == , 
+        'must have the columns "a" and "b"'
       ),
+
+      vf.frame.not_empty(),
+      vf.frame.rows(4),
+      vf.frame.cols(2),
 
       vf.CellsValidator(
         lambda xs: all([not isinstance(x, Mystery) for x in xs]), 
@@ -76,6 +80,11 @@ class TestEverything(unittest.TestCase):
         lambda xs: all([x == 1 for x in xs]), 
         'all must equal 1',
         cols=['a'], rows=[0, 3]
+      ),
+
+      vf.FrameValidator(
+        lambda df: df.loc[[0,3],['a']][df == 1].count().sum() == len(df.loc[[0,3],['a']]), 
+        'all must equal 1'
       ),
 
       vf.CellsValidator(
@@ -128,10 +137,10 @@ class TestEverything(unittest.TestCase):
     self._test_should_pass(pass_validators, df)
 
     fail_validators = [
-      vf.FrameValidator(
-        lambda df: df.shape[0] != 4,
-        'must be less than 4 rows'
-      ),
+
+      vf.frame.not_empty(),
+      vf.frame.rows(10),
+      vf.frame.cols(1),
 
       vf.CellsValidator(
         R.all(R.isinstance(Number)),
@@ -169,10 +178,10 @@ class TestEverything(unittest.TestCase):
 
       vf.CellsValidator(
         R.pipe(R.filter(R.isinstance(float)), R.all(lambda x: x < 0)),
-        'all floats in in row 1, 3, and 4 and col b must be less than 0', 
-        cols=['b'], rows=[4,3,1])
+        'all floats in in row 0, 2, and 3 and col b must be less than 0', 
+        cols=['b'], rows=[3,2,0])
     ]
 
-    self._test_should_fail(fail_validators, df)
+    self._test_should_fail(fail_validators, test_df)
 
 unittest.main()
