@@ -6,36 +6,39 @@ class SliceValidator(V.Validator):
     
     self.cols = cols
     self.rows = rows
+  
+  def validate(self, target):
+    super().validate(target)
+    # print('passed:', self.fail_msg)
+
+  def slice(self, df):
+    if self.rows is None and self.cols is None:
+      sliced_df = df
+    elif self.rows is None and self.cols is not None:
+      sliced_df = df[self.cols]
+    elif self.rows is not None and self.cols is None:
+      sliced_df = df.loc[self.rows]
+    else: # self.rows and self.cols not None
+      sliced_df = df.loc[self.rows, self.cols]
+    return sliced_df
 
 class FrameValidator(SliceValidator):
   def validate(self, df):
-    if self.rows is None and self.cols is None:
-      sliced_df = df
-    elif self.rows is None:
-      sliced_df = df.loc[self.rows]
-    elif self.cols is None:
-      sliced_df = df[self.cols]
-    else: # self.rows and self.cols not None
-      sliced_df = df.loc[self.rows, self.cols]
-
-    super().validate(sliced_df)
+    super().validate(self.slice(df))
 
 class CellsValidator(SliceValidator):
   def validate(self, df):
-    cells = CellsValidator.iter_cells(df, self.cols, self.rows)
+    cells = CellsValidator.iter_cells(self.slice(df))
     super().validate(cells)
 
   @staticmethod
-  def iter_cells(df, cols=None, rows=None):
-    rows_slice = range(len(df)) if rows is None else rows
-    cols_slice = df.columns if cols is None else cols
-
-    for row_idx in rows_slice: 
-      for col_name in cols_slice:
+  def iter_cells(df):
+    cols = df.columns
+    for row_idx, row in df.iterrows(): 
+      for col_name in cols:
         yield df.loc[row_idx, col_name]
 
-class RowsValidator(V.Validator):
-
+class RowsValidator(SliceValidator):
   def validate(self, df):
-    rows = df.iterrows()
+    rows = self.slice(df).iterrows()
     super().validate(rows)

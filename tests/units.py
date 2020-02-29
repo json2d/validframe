@@ -52,8 +52,8 @@ class TestEverything(unittest.TestCase):
 
     pass_validators = [
       vf.FrameValidator(
-        lambda df: df.columns == , 
-        'must have the columns "a" and "b"'
+        lambda df: 'a' in df.columns, 
+        'must have the column "a"'
       ),
 
       vf.frame.not_empty(),
@@ -134,11 +134,11 @@ class TestEverything(unittest.TestCase):
       ),
     ]
 
-    self._test_should_pass(pass_validators, df)
+    self._test_should_pass(pass_validators, test_df)
 
     fail_validators = [
 
-      vf.frame.not_empty(),
+      vf.frame.empty(),
       vf.frame.rows(10),
       vf.frame.cols(1),
 
