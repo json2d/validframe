@@ -19,8 +19,10 @@ class CellsValidator(V.Validator):
   @staticmethod
   def iter_cells(df, cols=None, rows=None):
     for row_idx in range(len(df)): 
-      for col_name in df.columns:
-        yield df.loc[row_idx, col_name]
+      if rows is None or row_idx in rows:
+        for col_name in df.columns:
+          if cols is None or col_name in cols:
+            yield df.loc[row_idx, col_name]
 
 class RowsValidator(V.Validator):
 

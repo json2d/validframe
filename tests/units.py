@@ -16,6 +16,9 @@ import pandas as pd
 
 import validframe as vf
 
+# extensions for some missing ramda functions
+R.isinstance = lambda x: lambda y: isinstance(y,x)
+
 class TestEverything(unittest.TestCase):
 
   # use `_test` prefix isntead of `test` (w/o leading underscore) so test runner doesn't use it
@@ -66,19 +69,19 @@ class TestEverything(unittest.TestCase):
       vf.CellsValidator(
         lambda xs: all([x == 1 for x in xs]), 
         'all must equal 1',
-        cols='a'
+        cols=['a']
       ),
 
       vf.CellsValidator(
         lambda xs: all([x == 1 for x in xs]), 
         'all must equal 1',
-        rows=[0, 3]
+        cols=['a'], rows=[0, 3]
       ),
 
       vf.CellsValidator(
         lambda xs: all([x == -42 or x == 3.14 for x in xs]),
         'all must equal 42 or 3.14',
-        cols='b', rows=[0, 3]
+        cols=['b'], rows=[0, 3]
       ),
 
       vf.CellsValidator(
@@ -89,10 +92,10 @@ class TestEverything(unittest.TestCase):
       
       vf.CellsValidator(
         lambda xs: all([
-          x == -42 or x == 3.14 
+          x == -42 or x == 1
           for x in filter(lambda x: isinstance(x, int), xs)
         ]),
-        'all that are numbers must equal to -42 or 3.14'
+        'all that are int must equal to -42 or 1'
       ),
 
       vf.CellsValidator(
@@ -109,7 +112,7 @@ class TestEverything(unittest.TestCase):
           for x in filter(lambda x: isinstance(x, int), xs)
         ]),
         'all that are ints must equal to -42',
-        cols='b'
+        cols=['b']
       ),
 
       vf.CellsValidator(
@@ -118,7 +121,7 @@ class TestEverything(unittest.TestCase):
           for x in filter(lambda x: isinstance(x, int), xs)
         ]),
         'all that are ints must equal to -42',
-        cols='b', rows=[0,1,2]
+        cols=['b'], rows=[0,1,2]
       ),
     ]
 
@@ -138,17 +141,12 @@ class TestEverything(unittest.TestCase):
       vf.CellsValidator(
         R.all(R.isinstance(Number)),
         'all in column b must be numbers',
-        cols='b'), # all cells in col 'a' are numbers
-      
-      vf.CellsValidator(
-        R.all(R.isinstance(Number)),
-        'all in column b must be numbers',
         cols=['b']), # all cells in col 'a' are numbers
 
       vf.CellsValidator(
         R.all(lambda x: x < 0), 
         'all in row 0 must be less than 0',
-        rows=0
+        rows=[0]
       ), # all cells in row 0 and 3 are negative (and numbers)
 
       vf.CellsValidator(
@@ -160,7 +158,7 @@ class TestEverything(unittest.TestCase):
       vf.CellsValidator(
         R.all(lambda x: x < 0), 
         'all in row 0 and 3 and col b must be less than 0',
-        cols='b', rows=[0, 3]
+        cols=['b'], rows=[0, 3]
       ),
 
       vf.CellsValidator(
