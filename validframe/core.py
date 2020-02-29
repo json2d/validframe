@@ -18,7 +18,9 @@ class CellsValidator(V.Validator):
 
   @staticmethod
   def iter_cells(df, cols=None, rows=None):
-    raise NotImplementedError
+    for row_idx in range(len(df)): 
+      for col_name in df.columns:
+        yield df.loc[row_idx, col_name]
 
 class RowsValidator(V.Validator):
 

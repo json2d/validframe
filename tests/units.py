@@ -40,7 +40,9 @@ class TestEverything(unittest.TestCase):
         [1, None], # row 2
         [1, None], # row 3
         [1, 3.14], # row 4
-      ])
+      ],
+      dtype=object # prevent None from being converted to np.nan - ref: https://stackoverflow.com/a/48453225
+    )
     
     class Mystery():
       pass
