@@ -184,4 +184,57 @@ class TestEverything(unittest.TestCase):
 
     self._test_should_fail(fail_validators, test_df)
 
+
+  def test_predefined(self):
+
+    test_df = pd.DataFrame(
+      columns = ['a','b'],
+      data = [
+        [1, -42], # row 0
+        [1, None], # row 1
+        [1, None], # row 2
+        [1, 3.14], # row 3
+      ],
+      dtype=object # prevent None from being converted to np.nan - ref: https://stackoverflow.com/a/48453225
+    )
+    
+    pass_validators = [
+      vf.frame.not_empty(),
+      vf.frame.rows(4),
+      vf.frame.cols(2),
+
+      vf.cells.all_is(int, cols=['a']),
+      vf.cells.all_is(type(None), cols=['b'], rows=[1,2]),
+      
+      vf.cells.all_eq(1, cols=['a']),
+      vf.cells.all_gt(0, rows=[3]),
+      vf.cells.all_lt(0, cols=['b'], rows=[0]),
+
+      vf.cells.sum_eq(4, cols=['a']),
+      vf.cells.sum_gt(4, rows=[3]),
+      vf.cells.sum_lt(4, rows=[0]),
+    ]
+
+    self._test_should_pass(pass_validators, test_df)
+
+    fail_validators = [
+
+      vf.frame.empty(),
+      vf.frame.rows(10),
+      vf.frame.cols(1),
+
+      vf.cells.all_is(int),
+      vf.cells.all_is(type(None)),
+
+      vf.cells.all_eq(100, cols=['a']),
+      vf.cells.all_gt(100, rows=[3]),
+      vf.cells.all_lt(-100, cols=['b'], rows=[0]),
+
+      vf.cells.sum_eq(0, cols=['a']),
+      vf.cells.sum_gt(100, rows=[3]),
+      vf.cells.sum_lt(-100, rows=[0]),
+    ]
+
+    self._test_should_fail(fail_validators, test_df)
+
 unittest.main()
