@@ -3,6 +3,8 @@ useful validators for pandas dataframes
 
 ## Basic usage
 
+Here's how to create a basic validator for list of cells using `CellsValidator`:
+
 ```py
 import validframe as vf
 
@@ -15,47 +17,64 @@ df = pd.DataFrame(
     [1, 3.14] # row 3
   ])
 
-vf.cells.validator(lambda x: x>0)(col='a')(df)
+all_gt_zero_validator = vf.CellsValidator(
+  lambda xs: all([x>0 for x in xs]),
+  'all cells must be greater than 0'
+  cols=['a']
+)
 
-vf.cells.positive()(df) # AssertionError
-vf.cells.not_empty()(df) # AssertionError
-vf.cells.empty()(df) # AssertionError
-
-vf.cells.positive(row=0)(df)
-vf.cells.negative(row=0)(df) # AssertionError
-vf.cells.not_empty(row=0)(df)
-vf.cells.not_empty(row=1)(df) # AssertionError
-vf.cells.not_empty(col='a')(df)
-vf.cells.not_empty(col='b')(df) # AssertionError
-
-vf.cells.empty(col='b', row=1)(df)
-vf.cells.empty(col='b')(df) # AssertionError
-
-vf.cells.min(0)(col='a')(df)
-vf.cells.max(2)(col='a')(df)
-vf.cells.minmax(0, 2)(col='a')(df)
-
-vf.cells.ints(col='a')(df)
-vf.cells.ints(row=0)(df)
-vf.cells.ints(col='b')(df) # AssertionError
-
-vf.cells.strs(col='b', row=3)(df)
-vf.cells.floats(col='b', row=4)(df)
-
-vf.cells.totals(4, col='a')(df)
+all_gt_zero_validator.validate(df) # AssertionError: all cells must be greater than 0
 
 ```
 
-### boycotting lambdas?
+### Going functional?
 
-use functions instead
+Using a functional programming library like `ramda` can make your validation logic code alot cleaner and readable
+
 ```py
-def is_cell_foo(x):
-  foo = (None, str, int, float)
-  return isinstance(x, foo)
-
-validate_is_cells_foo = vf.cells.validator(is_cell_foo)
-
-validate_is_cells_foo(df)
-
+# same as above
+all_gt_zero_validator = vf.CellsValidator(
+  R.all(lambda x: x>0),
+  'all cells must be greater than 0'
+  cols=['a']
+)
 ```
+
+This is especially true when the validation logic start to become a bit more complex:
+
+```py
+sum_numbers_eq_zero_validator = vf.CellsValidator(
+  R.compose(R.equals(0), R.sum, R.filter(lambda x: isinstance(x, Number)),
+  'all cells that are numbers summed must be greater than 0'
+  cols=['credit', 'debit']
+)
+```
+
+### Boycotting lambdas?
+
+Using functions instead works just fine
+
+```py
+def all_gt_zero(xs):
+  return all([x>0 for x in xs])
+
+all_gt_zero_validator = vf.CellsValidator(all_gt_zero, 'all cells must be greater than 0')
+```
+
+### Predefined validators
+
+Here are a couple of super common validators for the sake of convenience:
+
+```py
+vf.cells.all_eq(1, cols=['a']).validate(df) 
+vf.cells.all_is(type(None)).validate(df) # AssertionError
+
+vf.cells.all_gt(0, rows=[0]).validate(df)
+vf.cells.all_lt(0, rows=[0]).validate(df) # AssertionError
+
+vf.cells.sum_eq(4, cols=['a']).validate(df)
+vf.cells.sum_gt(0, cols=['a']).validate(df)
+vf.cells.sum_lt(10, cols=['a']).validate(df)
+```
+
+Think there are some other validators that should be included? Issues and PRs welcomed!
