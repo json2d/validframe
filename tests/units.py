@@ -56,10 +56,6 @@ class TestEverything(unittest.TestCase):
         'must have the column "a"'
       ),
 
-      vf.frame.not_empty(),
-      vf.frame.rows(4),
-      vf.frame.cols(2),
-
       vf.CellsValidator(
         lambda xs: all([not isinstance(x, Mystery) for x in xs]), 
         'all must not be instances of type Mystery'
@@ -137,10 +133,6 @@ class TestEverything(unittest.TestCase):
     self._test_should_pass(pass_validators, test_df)
 
     fail_validators = [
-
-      vf.frame.empty(),
-      vf.frame.rows(10),
-      vf.frame.cols(1),
 
       vf.CellsValidator(
         R.all(R.isinstance(Number)),
