@@ -1,14 +1,17 @@
-def validator(validate_frame, fail_msg=None):
-  
-  assert callable(validate_frame), "argument 'validate_frame' must be callable"
+from .core import FrameValidator
 
-  def assert_is_valid(df, **kwargs): 
-    
-    assert validate_frame(df), fail_msg
+def empty():
+  return FrameValidator(lambda df: df.size == 0, 'dataframe must be empty')
 
-  return assert_is_valid
+not_empty = lambda : FrameValidator(
+  lambda df: df.size > 0, 
+  'dataframe must not be empty'
+)
 
-def existant():
-  return validator(lambda df: df.shape[0] + df.shape[1] > 0, 'df must be existant')
+cols = lambda n : FrameValidator(
+  lambda df: df.shape[1] == n, 
+  'dataframe must have {} cols'.format(n)
+)
 
-non_existant = lambda : validator(lambda df: df.shape[0] + df.shape[1] > 0, 'df must be non-existant')
+def rows(n):
+  return FrameValidator(lambda df: df.shape[0] == n, 'dataframe must have {} rows'.format(n))

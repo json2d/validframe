@@ -16,6 +16,9 @@ import pandas as pd
 
 import validframe as vf
 
+# extensions for some missing ramda functions
+R.isinstance = lambda x: lambda y: isinstance(y,x)
+
 class TestEverything(unittest.TestCase):
 
   # use `_test` prefix isntead of `test` (w/o leading underscore) so test runner doesn't use it
@@ -33,67 +36,74 @@ class TestEverything(unittest.TestCase):
 
   def test_base(self):
 
-    df = pd.DataFrame(
+    test_df = pd.DataFrame(
       columns = ['a','b'],
       data = [
-        [1, -42], # row 1
+        [1, -42], # row 0
+        [1, None], # row 1
         [1, None], # row 2
-        [1, None], # row 3
-        [1, 3.14], # row 4
-      ])
+        [1, 3.14], # row 3
+      ],
+      dtype=object # prevent None from being converted to np.nan - ref: https://stackoverflow.com/a/48453225
+    )
     
     class Mystery():
       pass
 
     pass_validators = [
-      vf.frame.validator(
-        lambda df: df.shape[0] == 2, 
-        'must have 2 columns'
+      vf.FrameValidator(
+        lambda df: 'a' in df.columns, 
+        'must have the column "a"'
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([not isinstance(x, Mystery) for x in xs]), 
         'all must not be instances of type Mystery'
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([x is None or x >= -42 for x in xs]), 
         'all must be None or greater than -42'
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([x == 1 for x in xs]), 
         'all must equal 1',
-        col='a'
+        cols=['a']
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([x == 1 for x in xs]), 
         'all must equal 1',
-        row=[0, 3]
+        cols=['a'], rows=[0, 3]
       ),
 
-      vf.cells.validator(
+      vf.FrameValidator(
+        lambda df: df.loc[[0,3],['a']][df == 1].count().sum() == len(df.loc[[0,3],['a']]), 
+        'all must equal 1'
+      ),
+
+      vf.CellsValidator(
         lambda xs: all([x == -42 or x == 3.14 for x in xs]),
         'all must equal 42 or 3.14',
-        col='b', row=[0, 3]
+        cols=['b'], rows=[0, 3]
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([x == 1 for x in xs]), 
         'all must equal 1',
-        col=['a'], row=[0, 3]
+        cols=['a'], rows=[0, 3]
       ),
       
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([
-          x == -42 or x == 3.14 
+          x == -42 or x == 1
           for x in filter(lambda x: isinstance(x, int), xs)
         ]),
-        'all that are numbers must equal to -42 or 3.14'
+        'all that are int must equal to -42 or 1'
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([
           x is None
           for x in filter(lambda x: not isinstance(x, Number), xs)
@@ -101,207 +111,122 @@ class TestEverything(unittest.TestCase):
         'all that are not numbers must be None'
       ),
       
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([
           x == -42
           for x in filter(lambda x: isinstance(x, int), xs)
         ]),
         'all that are ints must equal to -42',
-        col='b'
+        cols=['b']
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         lambda xs: all([
           x == -42
           for x in filter(lambda x: isinstance(x, int), xs)
         ]),
         'all that are ints must equal to -42',
-        col='b', row=[0,1,2]
+        cols=['b'], rows=[0,1,2]
       ),
     ]
 
-    self._test_should_pass(pass_validators, df)
+    self._test_should_pass(pass_validators, test_df)
 
     fail_validators = [
-      vf.frame.validator(
-        lambda df: df.shape[1] < 4,
-        'must be less than 4 rows'
-      ),
 
-      vf.cells.validator(
-        R.all(R.is(Number)),
+      vf.CellsValidator(
+        R.all(R.isinstance(Number)),
         'all must be numbers'
       ),
 
-      vf.cells.validator(
-        R.all(R.is(Number)),
+      vf.CellsValidator(
+        R.all(R.isinstance(Number)),
         'all in column b must be numbers',
-        , col='b'), # all cells in col 'a' are numbers
-      
-      vf.cells.validator(
-        R.all(R.is(Number)),
-        'all in column b must be numbers',
-        col=['b']), # all cells in col 'a' are numbers
+        cols=['b']), # all cells in col 'a' are numbers
 
-      vf.cells.validator(
+      vf.CellsValidator(
         R.all(lambda x: x < 0), 
         'all in row 0 must be less than 0',
-        row=0
+        rows=[0]
       ), # all cells in row 0 and 3 are negative (and numbers)
 
-      vf.cells.validator(
+      vf.CellsValidator(
         R.all(lambda x: x < 0), 
         'all in row 0 and 3 must be less than 0',
-        row=[0, 3]
+        rows=[0, 3]
       ), # all cells in row 0 and 3 are negative (and numbers)
 
-      vf.cells.validator(
+      vf.CellsValidator(
         R.all(lambda x: x < 0), 
         'all in row 0 and 3 and col b must be less than 0',
-        col='b', row=[0, 3]
+        cols=['b'], rows=[0, 3]
       ),
 
-      vf.cells.validator(
+      vf.CellsValidator(
         R.all(lambda x: x < 0), 
         'all in row 0 and 3 and col a must be less than 0', 
-        col=['a'], row=[0, 3]
+        cols=['a'], rows=[0, 3]
       ),
 
-      vf.cells.validator(
-        R.pipe(R.filter(R.is(float)), R.all(lambda x: x < 0)),
-        'all floats in in row 1, 3, and 4 and col b must be less than 0', 
-        col=['b'], row=[4,3,1])
+      vf.CellsValidator(
+        R.pipe(R.filter(R.isinstance(float)), R.all(lambda x: x < 0)),
+        'all floats in in row 0, 2, and 3 and col b must be less than 0', 
+        cols=['b'], rows=[3,2,0])
     ]
 
-    self._test_should_fail(fail_validators, df)
+    self._test_should_fail(fail_validators, test_df)
 
 
-  def test_mappers(self):
+  def test_predefined(self):
 
-    df = pd.DataFrame(
-      columns = ['a', 'b', 'c'], # headers
+    test_df = pd.DataFrame(
+      columns = ['a','b'],
       data = [
-        ['a', 'b', 'c'], # headers
-        [1, -42, 'hello'], # row 0
-        [1, None, 'world'], # row 1
-        [1, None, 'ciao'], # row 2
-        [1, 3.14, 'mondo'], # row 3
-      ])
-
+        [1, -42], # row 0
+        [1, None], # row 1
+        [1, None], # row 2
+        [1, 3.14], # row 3
+      ],
+      dtype=object # prevent None from being converted to np.nan - ref: https://stackoverflow.com/a/48453225
+    )
+    
     pass_validators = [
       vf.frame.not_empty(),
-      vf.frame.rows(3),
-      vf.frame.cols(4),
-      vf.cells.positive(n=any),
-      vf.cells.positive(col='a'),
-      vf.cells.negative(col='b', row=0),
-      vf.cells.empty(n=any),
-      vf.cells.empty(col='b', row=[1,2]),
-      vf.cells.not_empty(col=['a','c'], row=[0,3]),
-      # vf.cells.min(0, col=['a','b'], row=3),
-      # vf.cells.max(3.14, col=['a','b'], row=3),
-      # vf.cells.minmax(-42, 3.14, filter=R.is(Number)),
-      vf.cells.ints(col='a'),
-      vf.cells.floats(col='b', row=3),
-      vf.cells.strs(col='c'), 
+      vf.frame.rows(4),
+      vf.frame.cols(2),
+
+      vf.cells.all_is(int, cols=['a']),
+      vf.cells.all_is(type(None), cols=['b'], rows=[1,2]),
+      
+      vf.cells.all_eq(1, cols=['a']),
+      vf.cells.all_gt(0, rows=[3]),
+      vf.cells.all_lt(0, cols=['b'], rows=[0]),
+
+      vf.cells.sum_eq(4, cols=['a']),
+      vf.cells.sum_gt(4, rows=[3]),
+      vf.cells.sum_lt(4, rows=[0]),
     ]
 
-    self._test_should_pass(pass_validators, df)
-
+    self._test_should_pass(pass_validators, test_df)
 
     fail_validators = [
+
       vf.frame.empty(),
+      vf.frame.rows(10),
+      vf.frame.cols(1),
 
-      vf.frame.rows(1),
-      vf.frame.cols(5),
-      # vf.cells.positive(col='b', row=0),
-      # vf.cells.negative(col='a'),
-      vf.cells.eq(1, col='a'),
-      vf.cells.gte(1, col='a'),
-      vf.cells.gt(1, col='a'),
-      vf.cells.lt(1, col='a'),
-      vf.cells.lte(1, col='a'),
+      vf.cells.all_is(int),
+      vf.cells.all_is(type(None)),
 
-      vf.cells.empty(col=['a','c'], row=[0,3]),
-      vf.cells.not_empty(col='b', row=[1,2]),
-      # vf.cells.min(3.14, col=['a','b'], row=3),
-      # vf.cells.max(0, col=['a','b'], row=3),
-      # vf.cells.minmax(0, 2, filter=R.is(Number)),
-      vf.cells.ints(col='b'),
-      vf.cells.floats(col='a'),
-      vf.cells.strs(row=3), 
-      vf.cells.dates(row=3), 
-      vf.cells.bools(col='c'), 
+      vf.cells.all_eq(100, cols=['a']),
+      vf.cells.all_gt(100, rows=[3]),
+      vf.cells.all_lt(-100, cols=['b'], rows=[0]),
+
+      vf.cells.sum_eq(0, cols=['a']),
+      vf.cells.sum_gt(100, rows=[3]),
+      vf.cells.sum_lt(-100, rows=[0]),
     ]
 
-
-    self._test_should_fail(fail_validators, df)
-
-  def test_reducers(self):
-
-    df = pd.DataFrame(
-      columns = ['a', 'b', 'c'], # headers
-      data = [
-        [1, -42, 'hello'], # row 0
-        [1, None, 'world'], # row 1
-        [1, None, 'ciao'], # row 2
-        [1, 3.14, 'mondo'] # row 3
-      ])
-
-
-    pass_validators = [
-      vf.cells.sum(4, col='a'), 
-      vf.cells.sum(R.gte(4), col='a'), 
-      vf.cells.validator(R.pipe(R.sum, R.eq(4))), col='a'), 
-      vf.cells.validator(sum_eq(4), 'sum must equal 4', col='a'), 
-      vf.cells.total(R.eq(-41), col=['a','b'], row=0), 
-      vf.cells.total(3.14, col=['a','b'], row=[0,3]), 
-      vf.cells.total(-38, filter=lambda x : isinstance(x, int)), 
-      vf.cells.total(7.14, filter=lambda x : isinstance(x, Number) and x > 0), 
-    ]
-
-    self._test_should_pass(pass_validators, df)
-
-
-    fail_validators = [
-      vf.cells.total(100, col='a'), 
-      vf.cells.total(R.gte(100), col='a'), 
-      vf.cells.total(1, row=1), # theres a None in this row
-      vf.cells.total('gg', col='c'), 
-    ]
-
-    self._test_should_fail(fail_validators, df)
-
-
-  def test_with_datetime(self):
-
-    some_day = datetime(2020, 1, 6)
-
-    df = pd.DataFrame(
-      columns = ['net_amount', 'product_name', 'trn_date'], # headers
-      data = [        
-        [5.50, 'canoli', some_day], # row 0
-        [9.50, 'tiramisu', some_day + timedelta(hours=1)], # row 1
-        [10, 'salad', some_day + timedelta(hours=2)], # row 2
-        [10, 'bread', some_day + timedelta(days=1)], # row 3
-      ])
-
-    pass_validators = [
-      vf.cells.minmax(some_day, some_day + timedelta(days=1), col='trn_date'),
-      vf.cells.min(some_day, col='trn_date'),
-      vf.cells.max(some_day + timedelta(days=2), col='trn_date'),
-    ]
-
-    self._test_should_pass(pass_validators, df)
-
-
-    fail_validators = [
-      vf.cells.minmax(some_day - timedelta(days=1), some_day, col='trn_date'),
-      vf.cells.min(some_day + timedelta(hours=2), col='trn_date'),
-      vf.cells.max(some_day + timedelta(hours=2), col='trn_date'),
-    ]
-
-    self._test_should_fail(fail_validators, df)
-
+    self._test_should_fail(fail_validators, test_df)
 
 unittest.main()

@@ -573,3 +573,23 @@ some_number_cells_in_row_3.negative()
 
 
 ```
+
+
+### classic classes
+
+```py
+FrameValidator(
+  R.pipe(frame2cells, R.all(R.eq(0))), # bloated
+  'all cells in dataframe must equal 0'
+)
+
+CellsValidator(
+  R.all(R.eq(0)), # much better
+  'all cells in dataframe must equal 0'
+)
+
+RowsValidator(
+  R.all(lambda row : row['total'] == row['sub_total'] + row['tax']),
+  'all rows must have total equal the sub-total plus tax 
+)
+```

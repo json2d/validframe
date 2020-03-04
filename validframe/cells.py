@@ -1,19 +1,45 @@
-def validator(validate_cell, fail_msg=None, col=None, row=None, filter=None):
+from .core import CellsValidator
 
-  assert callable(validate_cell), "argument 'validate_cell' must be callable"
+import ramda as R
 
-  def assert_is_valid(df, **kwargs): 
-    # assert any( ... )
-    raise NotImplementedError
+all_is = lambda y, **kwargs: CellsValidator(        
+  lambda xs: all([isinstance(x, y) for x in xs]), 
+  'all cells must be instances of {}'.format(y),
+  **kwargs
+)
 
-  return assert_is_valid
+all_eq = lambda y, **kwargs: CellsValidator(        
+  lambda xs: all([x == y for x in xs]), 
+  'all cells must be equal to {}'.format(y),
+  **kwargs
+)
 
-def positive(**kwargs):
-  return validator(
-    validate_cell=lambda x : x > 0, 
-    fail_msg="cells should be positive",
-    **kwargs
-  )
+all_gt = lambda y, **kwargs: CellsValidator(        
+  lambda xs: all([x > y for x in xs]), 
+  'all cells must be greater than {}'.format(y),
+  **kwargs
+)
 
-# or with just lambdas
-negative = lambda **kwargs : validator(lambda x: x < 0, "cells should be negative", **kwargs)
+all_lt = lambda y, **kwargs: CellsValidator(        
+  lambda xs: all([x < y for x in xs]), 
+  'all cells must be greater than {}'.format(y),
+  **kwargs
+)
+
+sum_eq = lambda y, **kwargs: CellsValidator(        
+  R.compose(R.equals(y), R.sum),
+  'all cells summed must be equal to {}'.format(y),
+  **kwargs
+)
+
+sum_gt = lambda y, **kwargs: CellsValidator(        
+  R.compose(lambda sum: sum > y, R.sum),
+  'all cells summed must be greater than {}'.format(y),
+  **kwargs
+)
+
+sum_lt = lambda y, **kwargs: CellsValidator(        
+  R.compose(lambda sum: sum < y, R.sum),
+  'all cells summed must be greater than {}'.format(y),
+  **kwargs
+)
