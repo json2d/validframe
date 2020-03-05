@@ -1,0 +1,20 @@
+version: '3'
+services:
+  test-runner:
+    build: 
+      context: .
+      dockerfile: python3.Dockerfile
+    command: python tests/units.py
+    volumes:
+     - .:/app
+    stdin_open: true
+    tty: true
+  test-runner-2:
+    build: 
+      context: .
+      dockerfile: python2.Dockerfile
+    command: python tests/units.py
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true

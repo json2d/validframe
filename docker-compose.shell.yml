@@ -1,0 +1,11 @@
+version: '3'
+services:
+  test-runner:
+    build: 
+      context: .
+      dockerfile: python3.Dockerfile
+    command: python
+    volumes:
+     - .:/app
+    stdin_open: true
+    tty: true
