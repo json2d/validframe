@@ -26,6 +26,12 @@ all_lt = lambda y, **kwargs: CellsValidator(
   **kwargs
 )
 
+all_in = lambda y, **kwargs: CellsValidator(        
+  lambda xs: all([x in y for x in xs]), 
+  'all cells must be included {}'.format(y),
+  **kwargs
+)
+
 sum_eq = lambda y, **kwargs: CellsValidator(        
   R.compose(R.equals(y), R.sum),
   'all cells summed must be equal to {}'.format(y),
