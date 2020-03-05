@@ -4,12 +4,12 @@ setup(
   packages = ['validframe'], # Chose the same as "name"
   version = '0.1.0', # Start with a small number and increase it with every change you make
   license= 'MIT', # Chose a license from here: https://help.github.com/articles/licensing-a-repository
-  description = 'a Python utility library for performing validations flexibly', # Give a short description about your library
+  description = 'validium validators for pandas dataframes', # Give a short description about your library
   author = 'Jason Yung',
   author_email = 'json.yung@gmail.com',
   url = 'https://github.com/json2d/validframe', # Provide either the link to your github or to your website
   download_url = 'https://github.com/json2d/validframe/archive/v0.1.0.tar.gz',
-  keywords = ['validation', 'dataframe', 'pandas'], # Keywords that define your package best
+  keywords = ['validation', 'dataframe', 'pandas', 'validium', 'rambda'], # Keywords that define your package best
   install_requires= ['validium', 'ramda'],
   classifiers=[
     'Development Status :: 3 - Alpha', # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
