@@ -16,6 +16,10 @@ def itercells(df):
   for row_idx, row in df.iterrows(): 
     for col_name in cols:
       yield df.loc[row_idx, col_name]
+
+def iterrows(df):
+  for row_idx, row in df.iterrows(): 
+    yield row # 👃 drop row_idx parameter - if needed can use FrameValidator instead of RowsValidator 
         
 class SliceValidator(V.Validator):
   def __init__(self, predicate, fail_msg=None, cols=None, rows=None):
@@ -39,5 +43,5 @@ class CellsValidator(SliceValidator):
 class RowsValidator(SliceValidator):
   def validate(self, df):
     sliced_df = slice(df, self.rows, self.cols)
-    rows = sliced_df.iterrows()
+    rows = iterrows(sliced_df)
     super().validate(rows)
