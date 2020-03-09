@@ -78,6 +78,30 @@ class TestEverything(unittest.TestCase):
         cols=['a'], rows=[0, 3]
       ),
 
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 1 for row in rows]), 
+        'all rows must have \'a\' equal 1'
+      ),
+
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 1 for row in rows]), 
+        'all rows must have \'b\' equal 1',
+        rows=[1,2]
+      ),
+
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 1 for row in rows]), 
+        'all rows must have \'b\' equal 1',
+        cols=['a']
+      ),
+
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 1 for row in rows]), 
+        'all rows must have \'b\' equal 1',
+        cols=['a'], rows=[1,2]
+      ),
+
+
       vf.FrameValidator(
         lambda df: df.loc[[0,3],['a']][df == 1].count().sum() == len(df.loc[[0,3],['a']]), 
         'all must equal 1'
@@ -171,7 +195,20 @@ class TestEverything(unittest.TestCase):
       vf.CellsValidator(
         R.pipe(R.filter(R.isinstance(float)), R.all(lambda x: x < 0)),
         'all floats in in row 0, 2, and 3 and col b must be less than 0', 
-        cols=['b'], rows=[3,2,0])
+        cols=['b'], rows=[3,2,0]
+      ),
+
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 3.14 for row in rows]), 
+        'all rows must have \'a\' equal 3.14'
+      ),
+
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 3.14 for row in rows]), 
+        'all rows must have \'a\' equal 3.14',
+        rows=[1,2]
+      ),
+
     ]
 
     self._test_should_fail(fail_validators, test_df)
