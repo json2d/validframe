@@ -42,6 +42,7 @@ validators = [
   vf.cells.sum_eq(-1, cols=['like_counts']) # all cells summed must equal -1
   vf.cells.sum_gt(0, cols=['like_counts']) # all cells summed must be greater than 0
   vf.cells.sum_lt(0, cols=['like_counts']) # all cells summed must be less than 0
+  vf.cells.uniq(cols=['like_counts']) # all cells must be unique
 ]
 
 for v in validators:
