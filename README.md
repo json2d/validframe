@@ -38,10 +38,15 @@ validators = [
 
   vf.cells.all_gt(0, cols=['like_counts']) # all cells must be greater than 0
   vf.cells.all_lt(0, cols=['like_counts']) # all cells must be less than 0
+  vf.cells.all_gte(0, cols=['like_counts']) # all cells must be greater than or equal to 0
+  vf.cells.all_lte(0, cols=['like_counts']) # all cells must be less than or equal to 0
 
   vf.cells.sum_eq(-1, cols=['like_counts']) # all cells summed must equal -1
   vf.cells.sum_gt(0, cols=['like_counts']) # all cells summed must be greater than 0
   vf.cells.sum_lt(0, cols=['like_counts']) # all cells summed must be less than 0
+  vf.cells.sum_gte(0, cols=['like_counts']) # all cells must be greater than or equal to 0
+  vf.cells.sum_lte(0, cols=['like_counts']) # all cells must be less than or equal to 0
+
   vf.cells.uniq(cols=['like_counts']) # all cells must be unique
 ]
 
