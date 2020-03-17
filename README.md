@@ -15,6 +15,9 @@ Need some faith in those frames? Let's dive in.
 Out-of-the-box you get a set of validators for the considerably more common ways to validate dataframes:
 
 ```py
+import pandas as pd
+import numpy as np
+
 df = pd.DataFrame(
   columns: ['like_counts','comment'], # headers
   data: [
@@ -32,14 +35,26 @@ validators = [
   vf.frame.rows(100) # frame must have 100 rows
   vf.frame.cols(2) # frame must have 2 cols
 
+  vf.cells.all_is(str, cols=['comment']) # all cells must be instances of <str>
   vf.cells.all_eq(1, cols=['like_counts']) # all cells must equal 1
-  vf.cells.all_is(str, cols=['comment']) # all cells must be instances of str
-  vf.cells.all_is(float, cols=['like_counts']) # all cells must be instances of float
-
   vf.cells.all_gt(0, cols=['like_counts']) # all cells must be greater than 0
   vf.cells.all_lt(0, cols=['like_counts']) # all cells must be less than 0
   vf.cells.all_gte(0, cols=['like_counts']) # all cells must be greater than or equal to 0
   vf.cells.all_lte(0, cols=['like_counts']) # all cells must be less than or equal to 0
+
+  vf.cells.some_eq(42, cols=['like_counts']) # some cells must equal 42
+  vf.cells.some_is(np.nan, cols=['comment']) # some cells must be instances of <numpy.nan>
+  vf.cells.some_gt(100000, cols=['like_counts']) # some cells must be greater than 100000
+  vf.cells.some_lt(987, cols=['like_counts']) # some cells must be less than 987
+  vf.cells.some_gte(100000, cols=['like_counts']) # some cells must be greater than or equal to 100000
+  vf.cells.some_lte(987, cols=['like_counts']) # some cells must be less than or equal to 987
+
+  vf.cells.none_eq(0, cols=['like_counts']) # no cells must equal 0
+  vf.cells.none_is(np.nan, cols=['comment']) # no cells must be instances of <numpy.nan>
+  vf.cells.none_gt(100000, cols=['like_counts']) # no cells must be greater than 100000
+  vf.cells.none_lt(42, cols=['like_counts']) # no cells must be less than 42
+  vf.cells.none_gte(100000, cols=['like_counts']) # no cells must be greater than or equal to 100000
+  vf.cells.none_lte(42, cols=['like_counts']) # no cells must be less than or equal to 42   
 
   vf.cells.sum_eq(-1, cols=['like_counts']) # all cells summed must equal -1
   vf.cells.sum_gt(0, cols=['like_counts']) # all cells summed must be greater than 0
@@ -58,9 +73,15 @@ for v in validators:
 
 # AssertionError: frame must be empty
 # AssertionError: frame must have 100 rows
-# AssertionError: all cells must be instances of float
-# AssertionError: all cells must be less than 0
-# AssertionError: all cells summed must be less than 0
+# AssertionError: (cols=['like_counts']) all cells must equal 1
+# AssertionError: (cols=['like_counts']) all cells must be less than 0
+# AssertionError: (cols=['like_counts']) all cells summed must be less than 0 
+# AssertionError: (cols=['comment']) some cells must be instances of <numpy.nan>
+# AssertionError: (cols=['like_counts']) some cells must be greater than 100000
+# AssertionError: (cols=['like_counts']) some cells must be less than 987
+# AssertionError: (cols=['like_counts']) no cells must be greater than or equal to 100000
+# AssertionError: (cols=['like_counts']) no cells must be less than or equal to 42
+
 
 ```
 
