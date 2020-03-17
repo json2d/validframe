@@ -20,8 +20,21 @@ all_gt = lambda y, **kwargs: CellsValidator(
   **kwargs
 )
 
+all_gte = lambda y, **kwargs: CellsValidator(        
+  lambda xs: all([x >= y for x in xs]), 
+  'all cells must be greater than {}'.format(y),
+  **kwargs
+)
+
+
 all_lt = lambda y, **kwargs: CellsValidator(        
   lambda xs: all([x < y for x in xs]), 
+  'all cells must be greater than {}'.format(y),
+  **kwargs
+)
+
+all_lte = lambda y, **kwargs: CellsValidator(        
+  lambda xs: all([x <= y for x in xs]), 
   'all cells must be greater than {}'.format(y),
   **kwargs
 )
