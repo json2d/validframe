@@ -56,6 +56,27 @@ validators = [
   vf.cells.none_gte(100000, cols=['like_counts']) # no cells must be greater than or equal to 100000
   vf.cells.none_lte(42, cols=['like_counts']) # no cells must be less than or equal to 42   
 
+  vf.cells.not_all_is(str, cols=['comment']) # not all cells must be instances of <str>
+  vf.cells.not_all_eq(1, cols=['like_counts']) # not all cells must equal 1
+  vf.cells.not_all_gt(0, cols=['like_counts']) # not all cells must be greater than 0
+  vf.cells.not_all_lt(0, cols=['like_counts']) # not all cells must be less than 0
+  vf.cells.not_all_gte(0, cols=['like_counts']) # not all cells must be greater than or equal to 0
+  vf.cells.not_all_lte(0, cols=['like_counts']) # not all cells must be less than or equal to 0
+
+  vf.cells.not_some_eq(42, cols=['like_counts']) # not some cells must equal 42
+  vf.cells.not_some_is(np.nan, cols=['comment']) # not some cells must be instances of <numpy.nan>
+  vf.cells.not_some_gt(100000, cols=['like_counts']) # not some cells must be greater than 100000
+  vf.cells.not_some_lt(987, cols=['like_counts']) # not some cells must be less than 987
+  vf.cells.not_some_gte(100000, cols=['like_counts']) # not some cells must be greater than or equal to 100000
+  vf.cells.not_some_lte(987, cols=['like_counts']) # not some cells must be less than or equal to 987
+
+  vf.cells.not_none_eq(0, cols=['like_counts']) # not no cells must equal 0
+  vf.cells.not_none_is(np.nan, cols=['comment']) # not no cells must be instances of <numpy.nan>
+  vf.cells.not_none_gt(100000, cols=['like_counts']) # not no cells must be greater than 100000
+  vf.cells.not_none_lt(42, cols=['like_counts']) # not no cells must be less than 42
+  vf.cells.not_none_gte(100000, cols=['like_counts']) # not no cells must be greater than or equal to 100000
+  vf.cells.not_none_lte(42, cols=['like_counts']) # not no cells must be less than or equal to 42   
+
   vf.cells.sum_eq(-1, cols=['like_counts']) # all cells summed must equal -1
   vf.cells.sum_gt(0, cols=['like_counts']) # all cells summed must be greater than 0
   vf.cells.sum_lt(0, cols=['like_counts']) # all cells summed must be less than 0
