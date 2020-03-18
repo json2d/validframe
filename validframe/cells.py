@@ -1,64 +1,21 @@
-from .core import CellsValidator
-
 import ramda as R
 
-all_is = lambda y, **kwargs: CellsValidator(        
-  R.all(R.is_(y)), 
-  'all cells must be instances of {}'.format(y),
-  **kwargs
-)
+from . import core as vf, factory_creators as fc
 
-all_eq = lambda y, **kwargs: CellsValidator(        
-  R.all(R.equals(y)), 
-  'all cells must be equal to {}'.format(y),
-  **kwargs
-)
+# curry down factory creators for vf.CellsValidator type
+qv_factory = lambda quantifier, predicate: fc.quantitative_validator_factory(vf.CellsValidator, quantifier, predicate)
+rv_factory = lambda reducer, predicate: fc.reductive_validator_factory(vf.CellsValidator, reducer, predicate)
 
-all_gt = lambda y, **kwargs: CellsValidator(        
-  R.all(R.gt(y)),
-  'all cells must be greater than {}'.format(y),
-  **kwargs
-)
+all_is = qv_factory(R.all, R.is_) 
+all_eq = qv_factory(R.all, R.equals)       
+all_gt = qv_factory(R.all, R.gt) 
+all_lt = qv_factory(R.all, R.lt) 
+all_gte = qv_factory(R.all, R.gte) 
+all_lte = qv_factory(R.all, R.lte) 
 
-all_gte = lambda y, **kwargs: CellsValidator(        
-  R.all(R.gte(y)), 
-  'all cells must be less than {}'.format(y),
-  **kwargs
-)
-
-
-all_lt = lambda y, **kwargs: CellsValidator(        
-  R.all(R.gt(y)), 
-  'all cells must be greater than or equal {}'.format(y),
-  **kwargs
-)
-
-all_lte = lambda y, **kwargs: CellsValidator(        
-  R.all(R.lte(y)), 
-  'all cells must be less than or equal {}'.format(y),
-  **kwargs
-)
-
-all_in = lambda y, **kwargs: CellsValidator(        
-  lambda xs: all([x in y for x in xs]), 
-  'all cells must be included {}'.format(y),
-  **kwargs
-)
-
-sum_eq = lambda y, **kwargs: CellsValidator(        
-  R.compose(R.equals(y), R.sum),
-  'all cells summed must be equal to {}'.format(y),
-  **kwargs
-)
-
-sum_gt = lambda y, **kwargs: CellsValidator(        
-  R.compose(lambda sum: sum > y, R.sum),
-  'all cells summed must be greater than {}'.format(y),
-  **kwargs
-)
-
-sum_lt = lambda y, **kwargs: CellsValidator(        
-  R.compose(lambda sum: sum < y, R.sum),
-  'all cells summed must be greater than {}'.format(y),
-  **kwargs
-)
+sum_is = rv_factory(R.sum, R.is_)
+sum_eq = rv_factory(R.sum, R.equals)
+sum_gt = rv_factory(R.sum, R.gt)
+sum_lt = rv_factory(R.sum, R.lt)
+sum_gte = rv_factory(R.sum, R.gte)
+sum_lte = rv_factory(R.sum, R.lte)

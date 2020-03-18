@@ -12,7 +12,7 @@ Need some faith in those frames? Let's dive in.
 
 ### Predefined validators
 
-Out-of-the-box you get a set of validators for the considerably more common ways to validate dataframes:
+Out-of-the-box you get a set of validator factories to handle the considerably more common ways to validate dataframes:
 
 ```py
 import pandas as pd
