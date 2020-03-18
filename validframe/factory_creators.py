@@ -18,6 +18,7 @@ QUANTIFIERS = {
     R.all: "all",
     R.any: "any",
     R0.some: "some",
+    R0.none: "none",
 }
 
 REDUCERS = {

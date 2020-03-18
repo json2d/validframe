@@ -20,6 +20,13 @@ some_lt = qv_factory(R0.some, R.lt)
 some_gte = qv_factory(R0.some, R.gte) 
 some_lte = qv_factory(R0.some, R.lte) 
 
+none_is = qv_factory(R0.none, R.is_) 
+none_eq = qv_factory(R0.none, R.equals)       
+none_gt = qv_factory(R0.none, R.gt) 
+none_lt = qv_factory(R0.none, R.lt) 
+none_gte = qv_factory(R0.none, R.gte) 
+none_lte = qv_factory(R0.none, R.lte) 
+
 sum_is = rv_factory(R.sum, R.is_)
 sum_eq = rv_factory(R.sum, R.equals)
 sum_gt = rv_factory(R.sum, R.gt)
