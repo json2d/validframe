@@ -16,9 +16,11 @@ PREDICATES = {
 
 QUANTIFIERS = {
     R.all: "all",
-    R.any: "any",
     R0.some: "some",
-    R0.none: "none",
+    R.none: "none",
+    R0.all_or_some: "all or some",
+    R0.some_or_none: "some or none",
+    R0.all_or_none: "all or none",
 }
 
 REDUCERS = {
