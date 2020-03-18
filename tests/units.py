@@ -305,7 +305,6 @@ class TestEverything(unittest.TestCase):
 
       vf.cells.sum_gt(0, cols=['like_counts']), # all cells summed must be greater than 0
       vf.cells.sum_gte(0, cols=['like_counts']), # all cells must be greater than or equal to 0
-
     ]
     
     self._test_should_pass(pass_validators, test_df)
@@ -342,5 +341,30 @@ class TestEverything(unittest.TestCase):
     ]
 
     self._test_should_fail(fail_validators, test_df)
+
+
+  def test_uniq(self):
+    test_df = pd.DataFrame(
+      columns = ['like_counts','comment', 'post_id'], # headers
+      data = [
+        [42, 'hello world', 111], # row 0
+        [100000, '😆', 111], # row 1
+        [123456, 'lol', 111], # row 2
+        [987, "you're the baz", 101] # row 3
+      ])
+
+    pass_validators = [
+      vf.rows.uniq(cols=['comment']),
+      vf.rows.uniq(cols=['comment', 'post_id']),
+    ]
+    
+    self._test_should_pass(pass_validators, test_df)
+
+    fail_validators = [
+      vf.rows.uniq(),
+      vf.rows.uniq(cols=['post_id']),
+    ]
+
+    self._test_should_fail(fail_validators, test_df)    
 
 unittest.main()
