@@ -38,6 +38,8 @@ validators = [
   vf.frame.rows(100), # frame must have 100 rows
   vf.frame.cols(2), # frame must have 2 cols
 
+  vf.rows.uniq(), # rows must be unique
+
   vf.cells.all_is(str, cols=['comment']), # all cells must be instances of <str>
   vf.cells.all_eq(1, cols=['like_counts']), # all cells must equal 1
   vf.cells.all_gt(0, cols=['like_counts']), # all cells must be greater than 0
