@@ -2,7 +2,7 @@ from typing import Callable
 
 import ramda as R
 
-from . import core as vf
+from . import core as vf, ramda_ext as R0
 
 
 PREDICATES = {
@@ -17,6 +17,7 @@ PREDICATES = {
 QUANTIFIERS = {
     R.all: "all",
     R.any: "any",
+    R0.some: "some",
 }
 
 REDUCERS = {
