@@ -1,4 +1,7 @@
 # 🖼 validframe
+[![PyPI version](https://badge.fury.io/py/validframe.svg)](https://badge.fury.io/py/validframe)
+[![Build Status](https://travis-ci.com/json2d/validframe.svg?branch=master)](https://travis-ci.com/json2d/validframe) [![Coverage Status](https://coveralls.io/repos/github/json2d/validframe/badge.svg?branch=master)](https://coveralls.io/github/json2d/validframe?branch=master)
+
 [`validium`](https://github.com/json2d/validium) validators for pandas dataframes
 
 ## Quick install
