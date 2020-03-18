@@ -17,9 +17,6 @@ import numpy as np
 
 import validframe as vf
 
-# extensions for some missing ramda functions
-R.isinstance = lambda x: lambda y: isinstance(y,x)
-
 class TestEverything(unittest.TestCase):
 
   # use `_test` prefix isntead of `test` (w/o leading underscore) so test runner doesn't use it
@@ -27,12 +24,14 @@ class TestEverything(unittest.TestCase):
     for validator in fail_validators:
       with self.assertRaises(AssertionError):
         validator.validate(df)
+        print('fail expected:', validator.msg)
 
   def _test_should_pass(self, pass_validators, df):
     try:
       for validator in pass_validators:
         validator.validate(df)
     except:
+      print('pass expected:', validator.msg)
       self.fail('validation should have passed but exception was raised')
 
   def test_base(self):
@@ -160,12 +159,12 @@ class TestEverything(unittest.TestCase):
     fail_validators = [
 
       vf.CellsValidator(
-        R.all(R.isinstance(Number)),
+        R.all(R.is_(Number)),
         'all must be numbers'
       ),
 
       vf.CellsValidator(
-        R.all(R.isinstance(Number)),
+        R.all(R.is_(Number)),
         'all in column b must be numbers',
         cols=['b']), # all cells in col 'a' are numbers
 
@@ -194,7 +193,7 @@ class TestEverything(unittest.TestCase):
       ),
 
       vf.CellsValidator(
-        R.pipe(R.filter(R.isinstance(float)), R.all(lambda x: x < 0)),
+        R.pipe(R.filter(R.is_(float)), R.all(lambda x: x < 0)),
         'all floats in in row 0, 2, and 3 and col b must be less than 0', 
         cols=['b'], rows=[3,2,0]
       ),
@@ -284,32 +283,28 @@ class TestEverything(unittest.TestCase):
       vf.cells.all_gte(0, cols=['like_counts']), # all cells must be greater than or equal to 0
 
       vf.cells.some_eq(42, cols=['like_counts']), # some cells must equal 42
-      vf.cells.some_gte(100000, cols=['like_counts']), # some cells must be greater than or equal to 100000
-      vf.cells.some_lte(987, cols=['like_counts']), # some cells must be less than or equal to 987
+      vf.cells.some_gte(123456, cols=['like_counts']), # some cells must be greater than or equal to 100000
+      vf.cells.some_lte(42, cols=['like_counts']), # some cells must be less than or equal to 987
 
       vf.cells.none_eq(0, cols=['like_counts']), # no cells must equal 0
       vf.cells.none_is(str, cols=['like_counts']), # no cells must be instances of <str>
       vf.cells.none_lt(42, cols=['like_counts']), # no cells must be less than 42
-      vf.cells.none_gte(100000, cols=['like_counts']), # no cells must be greater than or equal to 100000
+      vf.cells.none_gt(123456, cols=['like_counts']), # no cells must be greater than or equal to 100000
 
-      vf.cells.some_or_none_is(str, cols=['comment']), # some or no cells must be instances of <str>
+      vf.cells.some_or_none_eq(0, cols=['like_counts']), # some or no cells must equal 0
       vf.cells.some_or_none_lt(0, cols=['like_counts']), # some or no cells must be less than 0
       vf.cells.some_or_none_lte(0, cols=['like_counts']), # some or no cells must be less than or equal to 0
 
       vf.cells.all_or_none_is(str, cols=['comment']), # all or no cells must be instances of <str>
-      vf.cells.all_or_none_eq(42, cols=['like_counts']), # all or no cells must equal 42
-      vf.cells.all_or_none_gt(100000, cols=['like_counts']), # all or no cells must be greater than 100000
-      vf.cells.all_or_none_lt(987, cols=['like_counts']), # all or no cells must be less than 987
+      vf.cells.all_or_none_gt(123456, cols=['like_counts']), # all or no cells must be greater than 100000
+      vf.cells.all_or_none_lt(42, cols=['like_counts']), # all or no cells must be less than 987
 
       vf.cells.all_or_some_is(str, cols=['comment']), # all or some cells must be instances of <str>
-      vf.cells.all_or_some_gte(100000, cols=['like_counts']), # all or some cells must be greater than or equal to 100000
+      vf.cells.all_or_some_gte(123456, cols=['like_counts']), # all or some cells must be greater than or equal to 100000
       vf.cells.all_or_some_lte(42, cols=['like_counts']), # all or some cells must be less than or equal to 42   
 
-      vf.cells.sum_eq(-1, cols=['like_counts']), # all cells summed must equal -1
       vf.cells.sum_gt(0, cols=['like_counts']), # all cells summed must be greater than 0
-      vf.cells.sum_lt(0, cols=['like_counts']), # all cells summed must be less than 0
       vf.cells.sum_gte(0, cols=['like_counts']), # all cells must be greater than or equal to 0
-      vf.cells.sum_lte(0, cols=['like_counts']), # all cells must be less than or equal to 0
 
     ]
     
@@ -322,22 +317,27 @@ class TestEverything(unittest.TestCase):
       vf.cells.all_lte(0, cols=['like_counts']), # all cells must be less than or equal to 0
 
       vf.cells.some_is(type(np.nan), cols=['comment']), # some cells must be instances of <numpy.nan>
-      vf.cells.some_gt(100000, cols=['like_counts']), # some cells must be greater than 100000
-      vf.cells.some_lt(987, cols=['like_counts']), # some cells must be less than 987
+      vf.cells.some_gt(123456, cols=['like_counts']), # some cells must be greater than 100000
+      vf.cells.some_lt(42, cols=['like_counts']), # some cells must be less than 987
 
-      vf.cells.none_gt(100000, cols=['like_counts']), # no cells must be greater than 100000
+      vf.cells.none_gte(123456, cols=['like_counts']), # no cells must be greater than 100000
       vf.cells.none_lte(42, cols=['like_counts']), # no cells must be less than or equal to 42   
 
+      vf.cells.some_or_none_is(str, cols=['comment']), # some or no cells must be instances of <str>
       vf.cells.some_or_none_gt(0, cols=['like_counts']), # some or no cells must be greater than 0
       vf.cells.some_or_none_gte(0, cols=['like_counts']), # some or no cells must be greater than or equal to 0
 
-      vf.cells.some_or_none_eq(0, cols=['like_counts']), # some or no cells must equal 0
-      vf.cells.all_or_none_gte(100000, cols=['like_counts']), # all or no cells must be greater than or equal to 100000
-      vf.cells.all_or_none_lte(987, cols=['like_counts']), # all or no cells must be less than or equal to 987
+      vf.cells.all_or_none_eq(42, cols=['like_counts']), # all or no cells must equal 42
+      vf.cells.all_or_none_gte(123456, cols=['like_counts']), # all or no cells must be greater than or equal to 100000
+      vf.cells.all_or_none_lte(42, cols=['like_counts']), # all or no cells must be less than or equal to 987
 
       vf.cells.all_or_some_eq(0, cols=['like_counts']), # all or some cells must equal 0
-      vf.cells.all_or_some_gt(100000, cols=['like_counts']), # all or some cells must be greater than 100000
+      vf.cells.all_or_some_gt(123456, cols=['like_counts']), # all or some cells must be greater than 100000
       vf.cells.all_or_some_lt(42, cols=['like_counts']), # all or some cells must be less than 42
+
+      vf.cells.sum_eq(-1, cols=['like_counts']), # all cells summed must equal -1
+      vf.cells.sum_lt(0, cols=['like_counts']), # all cells summed must be less than 0
+      vf.cells.sum_lte(0, cols=['like_counts']), # all cells must be less than or equal to 0
 
     ]
 
