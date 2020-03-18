@@ -15,9 +15,12 @@ Need some faith in those frames? Let's dive in.
 Out-of-the-box you get a set of validators for the considerably more common ways to validate dataframes:
 
 ```py
+import pandas as pd
+import numpy as np
+
 df = pd.DataFrame(
-  columns: ['like_counts','comment'], # headers
-  data: [
+  columns = ['like_counts','comment'], # headers
+  data = [
     [42, 'hello world'], # row 0
     [100000, '😆'], # row 1
     [123456, 'lol'], # row 2
@@ -26,22 +29,61 @@ df = pd.DataFrame(
 
 
 validators = [
-  vf.frame.not_empty() # frame must be not empty
-  vf.frame.empty() # frame must be empty
-  vf.frame.rows(4) # frame must have 4 rows
-  vf.frame.rows(100) # frame must have 100 rows
-  vf.frame.cols(2) # frame must have 2 cols
+  vf.frame.not_empty(), # frame must be not empty
+  vf.frame.empty(), # frame must be empty
+  vf.frame.rows(4), # frame must have 4 rows
+  vf.frame.rows(100), # frame must have 100 rows
+  vf.frame.cols(2), # frame must have 2 cols
 
-  vf.cells.all_eq(1, cols=['like_counts']) # all cells must equal 1
-  vf.cells.all_is(str, cols=['comment']) # all cells must be instances of str
-  vf.cells.all_is(float, cols=['like_counts']) # all cells must be instances of float
+  vf.cells.all_is(str, cols=['comment']), # all cells must be instances of <str>
+  vf.cells.all_eq(1, cols=['like_counts']), # all cells must equal 1
+  vf.cells.all_gt(0, cols=['like_counts']), # all cells must be greater than 0
+  vf.cells.all_lt(0, cols=['like_counts']), # all cells must be less than 0
+  vf.cells.all_gte(0, cols=['like_counts']), # all cells must be greater than or equal to 0
+  vf.cells.all_lte(0, cols=['like_counts']), # all cells must be less than or equal to 0
 
-  vf.cells.all_gt(0, cols=['like_counts']) # all cells must be greater than 0
-  vf.cells.all_lt(0, cols=['like_counts']) # all cells must be less than 0
+  vf.cells.some_eq(42, cols=['like_counts']), # some cells must equal 42
+  vf.cells.some_is(np.nan, cols=['comment']), # some cells must be instances of <numpy.nan>
+  vf.cells.some_gt(100000, cols=['like_counts']), # some cells must be greater than 100000
+  vf.cells.some_lt(987, cols=['like_counts']), # some cells must be less than 987
+  vf.cells.some_gte(100000, cols=['like_counts']), # some cells must be greater than or equal to 100000
+  vf.cells.some_lte(987, cols=['like_counts']), # some cells must be less than or equal to 987
 
-  vf.cells.sum_eq(-1, cols=['like_counts']) # all cells summed must equal -1
-  vf.cells.sum_gt(0, cols=['like_counts']) # all cells summed must be greater than 0
-  vf.cells.sum_lt(0, cols=['like_counts']) # all cells summed must be less than 0
+  vf.cells.none_eq(0, cols=['like_counts']), # no cells must equal 0
+  vf.cells.none_is(str, cols=['like_counts']), # no cells must be instances of <str>
+  vf.cells.none_gt(100000, cols=['like_counts']), # no cells must be greater than 100000
+  vf.cells.none_lt(42, cols=['like_counts']), # no cells must be less than 42
+  vf.cells.none_gte(100000, cols=['like_counts']), # no cells must be greater than or equal to 100000
+  vf.cells.none_lte(42, cols=['like_counts']), # no cells must be less than or equal to 42   
+
+  vf.cells.some_or_none_is(str, cols=['comment']), # some or no cells must be instances of <str>
+  vf.cells.some_or_none_eq(0, cols=['like_counts']), # some or no cells must equal 0
+  vf.cells.some_or_none_gt(0, cols=['like_counts']), # some or no cells must be greater than 0
+  vf.cells.some_or_none_lt(0, cols=['like_counts']), # some or no cells must be less than 0
+  vf.cells.some_or_none_gte(0, cols=['like_counts']), # some or no cells must be greater than or equal to 0
+  vf.cells.some_or_none_lte(0, cols=['like_counts']), # some or no cells must be less than or equal to 0
+
+  vf.cells.all_or_none_is(str, cols=['comment']), # all or no cells must be instances of <str>
+  vf.cells.all_or_none_eq(42, cols=['like_counts']), # all or no cells must equal 42
+  vf.cells.all_or_none_gt(100000, cols=['like_counts']), # all or no cells must be greater than 100000
+  vf.cells.all_or_none_lt(987, cols=['like_counts']), # all or no cells must be less than 987
+  vf.cells.all_or_none_gte(100000, cols=['like_counts']), # all or no cells must be greater than or equal to 100000
+  vf.cells.all_or_none_lte(987, cols=['like_counts']), # all or no cells must be less than or equal to 987
+
+  vf.cells.all_or_some_is(str, cols=['comment']), # all or some cells must be instances of <str>
+  vf.cells.all_or_some_eq(0, cols=['like_counts']), # all or some cells must equal 0
+  vf.cells.all_or_some_gt(100000, cols=['like_counts']), # all or some cells must be greater than 100000
+  vf.cells.all_or_some_lt(42, cols=['like_counts']), # all or some cells must be less than 42
+  vf.cells.all_or_some_gte(100000, cols=['like_counts']), # all or some cells must be greater than or equal to 100000
+  vf.cells.all_or_some_lte(42, cols=['like_counts']), # all or some cells must be less than or equal to 42   
+
+  vf.cells.sum_eq(-1, cols=['like_counts']), # all cells summed must equal -1
+  vf.cells.sum_gt(0, cols=['like_counts']), # all cells summed must be greater than 0
+  vf.cells.sum_lt(0, cols=['like_counts']), # all cells summed must be less than 0
+  vf.cells.sum_gte(0, cols=['like_counts']), # all cells must be greater than or equal to 0
+  vf.cells.sum_lte(0, cols=['like_counts']), # all cells must be less than or equal to 0
+
+  vf.cells.uniq(cols=['comments']) # all cells must be unique
 ]
 
 for v in validators:
@@ -52,13 +94,27 @@ for v in validators:
 
 # AssertionError: frame must be empty
 # AssertionError: frame must have 100 rows
-# AssertionError: all cells must be instances of float
-# AssertionError: all cells must be less than 0
-# AssertionError: all cells summed must be less than 0
-
+# AssertionError: (cols=['like_counts']) all cells must equal 1
+# AssertionError: (cols=['like_counts']) all cells must be less than 0
+# AssertionError: (cols=['like_counts']) all cells must be less than or equal 0
+# AssertionError: (cols=['comment']) some cells must be instances of <numpy.nan>
+# AssertionError: (cols=['like_counts']) some cells must be greater than 100000
+# AssertionError: (cols=['like_counts']) some cells must be less than 987
+# AssertionError: (cols=['like_counts']) no cells must be greater than or equal to 100000
+# AssertionError: (cols=['like_counts']) no cells must be less than or equal to 42
+# AssertionError: (cols=['comment']) some or no cells must be instances of <str>
+# AssertionError: (cols=['like_counts']) some or no cells must be greater than 0
+# AssertionError: (cols=['like_counts']) some or no cells must be greater than or equal to 0
+# AssertionError: (cols=['like_counts']) all or no cells must equal 42
+# AssertionError: (cols=['like_counts']) all or no cells must be greater than or equal to 100000
+# AssertionError: (cols=['like_counts']) all or no cells must be less than or equal to 987
+# AssertionError: (cols=['like_counts']) all or some cells must equal 0
+# AssertionError: (cols=['like_counts']) all or some cells must be greater than 100000
+# AssertionError: (cols=['like_counts']) all or some cells must be less than 42
+# AssertionError: (cols=['like_counts']) all cells summed must be less than 0 
 ```
 
-Not exhaustive by any means - just enough to cover the baseline usage.
+Not quite exhaustive, but enough to cover basic use.
 
 > Think there are some other common validators that are missing here? Proposals via issues and PRs are welcomed 👍
 
