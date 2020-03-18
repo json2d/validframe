@@ -3,39 +3,39 @@ from .core import CellsValidator
 import ramda as R
 
 all_is = lambda y, **kwargs: CellsValidator(        
-  lambda xs: all([isinstance(x, y) for x in xs]), 
+  R.all(R.is_(y)), 
   'all cells must be instances of {}'.format(y),
   **kwargs
 )
 
 all_eq = lambda y, **kwargs: CellsValidator(        
-  lambda xs: all([x == y for x in xs]), 
+  R.all(R.equals(y)), 
   'all cells must be equal to {}'.format(y),
   **kwargs
 )
 
 all_gt = lambda y, **kwargs: CellsValidator(        
-  lambda xs: all([x > y for x in xs]), 
+  R.all(R.gt(y)),
   'all cells must be greater than {}'.format(y),
   **kwargs
 )
 
 all_gte = lambda y, **kwargs: CellsValidator(        
-  lambda xs: all([x >= y for x in xs]), 
-  'all cells must be greater than {}'.format(y),
+  R.all(R.gte(y)), 
+  'all cells must be less than {}'.format(y),
   **kwargs
 )
 
 
 all_lt = lambda y, **kwargs: CellsValidator(        
-  lambda xs: all([x < y for x in xs]), 
-  'all cells must be greater than {}'.format(y),
+  R.all(R.gt(y)), 
+  'all cells must be greater than or equal {}'.format(y),
   **kwargs
 )
 
 all_lte = lambda y, **kwargs: CellsValidator(        
-  lambda xs: all([x <= y for x in xs]), 
-  'all cells must be greater than {}'.format(y),
+  R.all(R.lte(y)), 
+  'all cells must be less than or equal {}'.format(y),
   **kwargs
 )
 

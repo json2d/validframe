@@ -17,9 +17,6 @@ import numpy as np
 
 import validframe as vf
 
-# extensions for some missing ramda functions
-R.isinstance = lambda x: lambda y: isinstance(y,x)
-
 class TestEverything(unittest.TestCase):
 
   # use `_test` prefix isntead of `test` (w/o leading underscore) so test runner doesn't use it
@@ -160,12 +157,12 @@ class TestEverything(unittest.TestCase):
     fail_validators = [
 
       vf.CellsValidator(
-        R.all(R.isinstance(Number)),
+        R.all(R.is_(Number)),
         'all must be numbers'
       ),
 
       vf.CellsValidator(
-        R.all(R.isinstance(Number)),
+        R.all(R.is_(Number)),
         'all in column b must be numbers',
         cols=['b']), # all cells in col 'a' are numbers
 
@@ -194,7 +191,7 @@ class TestEverything(unittest.TestCase):
       ),
 
       vf.CellsValidator(
-        R.pipe(R.filter(R.isinstance(float)), R.all(lambda x: x < 0)),
+        R.pipe(R.filter(R.is_(float)), R.all(lambda x: x < 0)),
         'all floats in in row 0, 2, and 3 and col b must be less than 0', 
         cols=['b'], rows=[3,2,0]
       ),
