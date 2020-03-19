@@ -154,6 +154,8 @@ class TestEverything(unittest.TestCase):
       ),
     ]
 
+    for v in pass_validators : self.assertTrue(v.confirm(test_df))
+
     self._test_should_pass(pass_validators, test_df)
 
     fail_validators = [
@@ -212,6 +214,66 @@ class TestEverything(unittest.TestCase):
     ]
 
     self._test_should_fail(fail_validators, test_df)
+
+
+  def test_base(self):
+
+    test_df = pd.DataFrame(
+      columns = ['a','b'],
+      data = [
+        [1, -42], # row 0
+        [1, None], # row 1
+        [1, None], # row 2
+        [1, 3.14], # row 3
+      ],
+      dtype=object # prevent None from being converted to np.nan - ref: https://stackoverflow.com/a/48453225
+    )
+    
+    class Mystery():
+      pass
+
+    pass_validators = [
+      vf.CellsValidator(
+        lambda xs: all([not isinstance(x, Mystery) for x in xs]), 
+        'all must not be instances of type Mystery'
+      ),
+
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 1 for row in rows]), 
+        'all rows must have \'a\' equal 1'
+      ),
+
+      vf.FrameValidator(
+        lambda df: df.loc[[0,3],['a']][df == 1].count().sum() == len(df.loc[[0,3],['a']]), 
+        'all must equal 1'
+      ),
+    ]
+
+    self._test_should_pass(pass_validators, test_df)
+
+    for v in pass_validators : self.assertTrue(v.confirm(test_df))
+
+    fail_validators = [
+
+      vf.CellsValidator(
+        R.all(R.is_(Number)),
+        'all must be numbers'
+      ),
+
+      vf.RowsValidator(
+        lambda rows: all([row['a'] == 3.14 for row in rows]), 
+        'all rows must have \'a\' equal 3.14'
+      ),
+
+      vf.FrameValidator(
+        lambda df: df.loc[[0,3],['a']][df != 1].count().sum() == len(df.loc[[0,3],['a']]), 
+        'all must not equal 1'
+      ),
+    ]
+
+    self._test_should_fail(fail_validators, test_df)
+
+    for v in fail_validators : self.assertFalse(v.confirm(test_df))
 
 
   def test_predefined(self):
