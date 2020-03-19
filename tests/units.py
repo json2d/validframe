@@ -354,6 +354,7 @@ class TestEverything(unittest.TestCase):
       ])
 
     pass_validators = [
+      vf.rows.uniq(),
       vf.rows.uniq(cols=['comment']),
       vf.rows.uniq(cols=['comment', 'post_id']),
     ]
@@ -361,7 +362,6 @@ class TestEverything(unittest.TestCase):
     self._test_should_pass(pass_validators, test_df)
 
     fail_validators = [
-      vf.rows.uniq(),
       vf.rows.uniq(cols=['post_id']),
     ]
 
