@@ -29,32 +29,32 @@ class SliceValidator(V.Validator):
     self.rows = rows
   
 class FrameValidator(SliceValidator):
-  def validate(self, df):
+  def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
-    super().validate(sliced_df)
+    super().validate(sliced_df, **kwargs)
 
-  def confirm(self, df):
+  def confirm(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
-    return super().confirm(sliced_df)    
+    return super().confirm(sliced_df, **kwargs) 
 
 class CellsValidator(SliceValidator):
-  def validate(self, df):
+  def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     cells = itercells(sliced_df)
-    super().validate(cells)
+    super().validate(cells, **kwargs)
 
-  def confirm(self, df):
+  def confirm(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     cells = itercells(sliced_df)
-    return super().confirm(cells)
+    return super().confirm(cells, **kwargs)
 
 class RowsValidator(SliceValidator):
-  def validate(self, df):
+  def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     rows = iterrows(sliced_df)
-    super().validate(rows)
+    super().validate(rows, **kwargs)
 
-  def confirm(self, df):
+  def confirm(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     rows = iterrows(sliced_df)
-    return super().confirm(rows)
+    return super().confirm(rows, **kwargs)
