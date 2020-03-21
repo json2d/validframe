@@ -11,7 +11,7 @@ install:
   - pip install coveralls
 # command to run tests and generate coverage report
 script:
-  - coverage run -m unittest discover
+  - coverage run tests/units.py
 # send coverage report to coveralls.io service
 after_success:
   - coveralls
