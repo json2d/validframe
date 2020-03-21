@@ -34,26 +34,26 @@ class FrameValidator(SliceValidator):
 
   def confirm(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
-    self._v.confirm(sliced_df, **kwargs) 
+    return self._v.confirm(sliced_df, **kwargs) 
 
 class CellsValidator(SliceValidator):
   def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     cells = itercells(sliced_df)
-    self._v.validate(sliced_df, **kwargs)
+    self._v.validate(cells, **kwargs)
 
   def confirm(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     cells = itercells(sliced_df)
-    self._v.confirm(sliced_df, **kwargs)
+    return self._v.confirm(cells, **kwargs)
 
 class RowsValidator(SliceValidator):
   def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     rows = iterrows(sliced_df)
-    self._v.validate(sliced_df, **kwargs)
+    self._v.validate(rows, **kwargs)
 
   def confirm(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     rows = iterrows(sliced_df)
-    self._v.confirm(sliced_df, **kwargs)
+    return self._v.confirm(rows, **kwargs)

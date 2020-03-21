@@ -24,14 +24,14 @@ class TestEverything(unittest.TestCase):
     for validator in fail_validators:
       with self.assertRaises(AssertionError):
         validator.validate(df)
-        print('fail expected:', validator.msg)
+        print('fail expected:', validator._v.msg)
 
   def _test_should_pass(self, pass_validators, df):
     try:
       for validator in pass_validators:
         validator.validate(df)
     except:
-      print('pass expected:', validator.msg)
+      print('pass expected:', validator._v.msg)
       self.fail('validation should have passed but exception was raised')
 
   def test_base(self):
