@@ -13,6 +13,19 @@ pip install validframe
 
 Need some faith in those frames? Let's dive in.
 
+```py
+import pandas as pd
+import validframe as vf
+
+df = pd.DataFrame(some_dataset)
+
+# ✅ validations
+for v in [
+  vf.frame.not_empty(), # lets prefer this
+  vf.frame.some_or_none_eq(np.nan), # maybe we're fine with a few null values
+] : v.validate(df)
+```
+
 ### Predefined validators
 
 Out-of-the-box you get a set of validator factories to handle the considerably more common ways to validate dataframes:
@@ -20,6 +33,7 @@ Out-of-the-box you get a set of validator factories to handle the considerably m
 ```py
 import pandas as pd
 import numpy as np
+import validframe as vf
 
 df = pd.DataFrame(
   columns = ['like_counts','comment'], # headers
