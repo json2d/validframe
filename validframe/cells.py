@@ -1,10 +1,10 @@
 import ramda as R
 
-from . import core as vf, ramda_ext as R0, factory_creators as fc
+from . import core as c, ramda_ext as R0, factory_creators as fc
 
-# curry down factory creators for vf.CellsValidator type
-qv_factory = lambda quantifier, predicate: fc.quantitative_validator_factory(vf.CellsValidator, quantifier, predicate)
-rv_factory = lambda reducer, predicate: fc.reductive_validator_factory(vf.CellsValidator, reducer, predicate)
+# curry down factory creators for c.CellsValidator type
+qv_factory = lambda quantifier, predicate: fc.quantitative_validator_factory(c.CellsValidator, quantifier, predicate)
+rv_factory = lambda reducer, predicate: fc.reductive_validator_factory(c.CellsValidator, reducer, predicate)
 
 all_is = qv_factory(R.all, R.is_) 
 all_eq = qv_factory(R.all, R.equals)       

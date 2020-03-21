@@ -21,27 +21,39 @@ def iterrows(df):
   for row_idx, row in df.iterrows(): 
     yield row # 👃 drop row_idx parameter - if needed can use FrameValidator instead of RowsValidator 
         
-class SliceValidator(V.Validator):
+class SliceValidator(object):
   def __init__(self, predicate, fail_msg=None, cols=None, rows=None):
-    super().__init__(predicate, fail_msg)
-    
     self.cols = cols
     self.rows = rows
-  
+    self._v = V.Validator(predicate, fail_msg)
+
 class FrameValidator(SliceValidator):
-  def validate(self, df):
+  def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
-    super().validate(sliced_df)
+    self._v.validate(sliced_df, **kwargs)
+
+  def confirm(self, df, **kwargs):
+    sliced_df = slice(df, self.rows, self.cols)
+    self._v.confirm(sliced_df, **kwargs) 
 
 class CellsValidator(SliceValidator):
-  def validate(self, df):
+  def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     cells = itercells(sliced_df)
-    super().validate(cells)
+    self._v.validate(sliced_df, **kwargs)
 
+  def confirm(self, df, **kwargs):
+    sliced_df = slice(df, self.rows, self.cols)
+    cells = itercells(sliced_df)
+    self._v.confirm(sliced_df, **kwargs)
 
 class RowsValidator(SliceValidator):
-  def validate(self, df):
+  def validate(self, df, **kwargs):
     sliced_df = slice(df, self.rows, self.cols)
     rows = iterrows(sliced_df)
-    super().validate(rows)
+    self._v.validate(sliced_df, **kwargs)
+
+  def confirm(self, df, **kwargs):
+    sliced_df = slice(df, self.rows, self.cols)
+    rows = iterrows(sliced_df)
+    self._v.confirm(sliced_df, **kwargs)

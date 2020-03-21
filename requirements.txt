@@ -1,4 +1,4 @@
-validium==0.1.1
+validium~=0.2.2
 pandas==1.0.1
 ramda==0.5.5
 coverage==5.0.4
